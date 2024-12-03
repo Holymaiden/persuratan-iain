@@ -302,9 +302,13 @@
                                     </div>
                                 </div>
 
-
+                                <div class="col-md-6 fv-row">
+                                    <label class="fs-6 fw-semibold mb-2">Keterangan</label>
+                                    <textarea id="uraian" name="uraian" class="form-control" id="" rows="5">
+                                        {{ isset($data->uraian) ? strip_tags($data->uraian) : '' }}
+                                    </textarea>
+                                </div>
                             </div>
-
 
                             <!--end::Input group-->
 
@@ -468,18 +472,16 @@
                     tujuanOption.hide();
                 }
             });
-
-            const editAsal = "{{ $data->asal }}";
-            if (editAsal && editAsal?.length > 0) {
-                $("#asal").val(editAsal).trigger("change")
-            }
-
-            const editTujuan = "{{ $data->tujuan }}";
-            if (editTujuan && editTujuan?.length > 0) {
-                $("#tujuan").val(editTujuan).trigger("change")
-            }
         });
 
+        ClassicEditor
+            .create(document.querySelector('#uraian'))
+            .then(editor => {
+                window.editor = editor
+            })
+            .catch(error => {
+                console.error('CKEditor initialization failed:', error);
+            });
 
         // Define form element
         const form = document.getElementById('kt_modal_new_target_form');
@@ -611,6 +613,19 @@
     </script>
 
     @if (isset($data->id))
+        <script>
+            $(document).ready(function() {
+                const editAsal = "{{ $data->asal }}";
+                if (editAsal && editAsal?.length > 0) {
+                    $("#asal").val(editAsal).trigger("change")
+                }
+
+                const editTujuan = "{{ $data->tujuan }}";
+                if (editTujuan && editTujuan?.length > 0) {
+                    $("#tujuan").val(editTujuan).trigger("change")
+                }
+            })
+        </script>
         @include('admin._card._updateAjax')
     @else
         @include('admin._card._createAjax')

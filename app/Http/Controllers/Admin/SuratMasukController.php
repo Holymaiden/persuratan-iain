@@ -72,11 +72,11 @@ class SuratMasukController extends Controller
             if ($req['asal'] == '20') {
                 $req['asal'] = $req['asalLain'];
             }
-            
+
             if ($req['tujuan'] == '20') {
                 $req['tujuan'] = $req['tujuanLain'];
             }
-            
+
             if ($request->hasFile('upload_file')) {
                 $image = $request->file('upload_file')->getClientOriginalName();
                 $image_name = pathinfo($image, PATHINFO_FILENAME);
