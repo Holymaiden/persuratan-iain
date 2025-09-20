@@ -94,6 +94,8 @@ class ArsipSuratController extends Controller
                 $files_name = pathinfo($files, PATHINFO_FILENAME);
                 $files_name = $this->uploadFile2($request->file('file'), $this->files_path, $files_old);
                 $req['file'] = $files_name;
+            } else {
+                $req['file'] = '-';
             }
 
             // handle pencipta option
@@ -111,7 +113,10 @@ class ArsipSuratController extends Controller
             // }
 
 
+
+
             $req['created_by'] = Auth::user()->id;
+            $req['uraian'] = $req['uraian'] ?? '-';
             $data = $this->repo->store($req);
             return response()->json(['data' => $data, 'success' => true]);
         } catch (\Exception $e) {
@@ -159,10 +164,11 @@ class ArsipSuratController extends Controller
                 $files_name = $this->uploadFile2($request->file('file'), $this->files_path, $data->files);
                 $req['file'] = $files_name;
             } else {
-                $req['file'] = $req['files_old'];
+                $req['file'] = $req['files_old'] ?? '-';
             }
 
             $req['updated_by'] = Auth::user()->id;
+            $req['uraian'] = $req['uraian'] ?? '-';
             $data = $this->repo->update($req, $request->id);
             return response()->json(['data' => $data, 'success' => true]);
         } catch (\Exception $e) {
@@ -220,7 +226,6 @@ class ArsipSuratController extends Controller
             return response()->json([
                 'pdf_url' => asset("storage/{$fileName}")
             ]);
-
         } catch (\Exception $e) {
             return view('errors.message', ['message' => $e->getMessage()]);
         }
@@ -236,7 +241,6 @@ class ArsipSuratController extends Controller
             $fileName = 'Export-Kearsipan-' . date('d-m-Y') . '.xlsx';
 
             return Excel::download(new ArsipExport($data, $header), $fileName);
-
         } catch (\Exception $e) {
             return view('errors.message', ['message' => $e->getMessage()]);
         }

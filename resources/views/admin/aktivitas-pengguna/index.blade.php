@@ -1,13 +1,5 @@
 @extends('admin._layouts.index')
 
-{{-- @push('cssScript')
-    @include('admin._layouts.partial._css')
-@endpush --}}
-
-{{-- @push('Data Master')
-    here show
-@endpush --}}
-
 @push($title)
     active
 @endpush
@@ -48,7 +40,7 @@
                         </div>
                         <div class="d-flex">
                             <input id="input_search" type="text" class="form-control form-control-solid w-300px me-3"
-                                placeholder="cari nomor / uraian">
+                                placeholder="cari email / username">
 
                             <button id="button_search" class="btn btn-secondary me-3">
                                 <span class="btn-label">
@@ -61,30 +53,9 @@
                                     <i class="fa fa-sync"></i>
                                 </span>
                             </button>
-
-                            {{-- <button id="button_filter" class="btn btn-secondary">
-                                Pencarian lanjut
-                            </button> --}}
-
-                            {{-- <button id="button_hideFilter" class="btn btn-secondary">
-                                Sembunyikan pencarian
-                            </button> --}}
                         </div>
                     </div>
                     <!--end::Card title-->
-
-                    <!--begin::Card toolbar-->
-                    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-                        <a href="{{ route($title . '.create') }}" class="btn btn-success">
-                            <span class="btn-label">
-                                <i class="fa fa-plus"></i>
-                            </span>
-                            Add New
-                        </a>
-                    </div>
-
-                    <!--end::Card toolbar-->
-
                 </div>
 
                 <!--end::Card header-->
@@ -97,58 +68,19 @@
                             <thead>
                                 <tr class="text-start text-gray-600 fw-bold fs-7 text-uppercase gs-0">
                                     <th class="min-w-20px pe-2">No</th>
-                                    <th class="min-w-120px text-nowrap">Nomor Arsip</th>
-                                    <th class="min-w-140px">Tanggal Arsip</th>
-                                    <th class="min-w-120px text-nowrap">Kode Klasifikasi</th>
-                                    {{-- <th class="min-w-120px">Perihal Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Unit Pengolah Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Lokal Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Jenis Media Arsip</th> --}}
-                                    <th class="min-w-300px">Uraian Arsip</th>
-                                    <th class="min-w-120px">Keterangan</th>
-                                    <th class="min-w-300px">Perihal</th>
-                                    <th class="min-w-120px">File</th>
-                                    {{-- <th class="min-w-120px">Nomor Rak</th> --}}
-                                    <th class="min-w-120px">Jumlah </th>
-                                    <th class="min-w-120px text-nowrap">Nomor Box</th>
-                                    {{-- <th class="min-w-120px">Pencipta Arsip</th> --}}
-                                    <th class="min-w-120px">Retensi</th>
-                                    <th class="text-end ">Actions</th>
+                                    <th class="min-w-120px text-nowrap">Name</th>
+                                    <th class="min-w-140px">Surat Masuk Dibuat</th>
+                                    <th class="min-w-120px text-nowrap">Surat Masuk Diubah</th>
+                                    <th class="min-w-300px">Surat Keluar Dibuat</th>
+                                    <th class="min-w-300px">Surat Keluar Diubah</th>
+                                    <th class="min-w-300px">Arsip Surat Dibuat</th>
+                                    <th class="min-w-300px">Arsip Surat Diubah</th>
                                 </tr>
                             </thead>
 
                             <tbody class="fw-semibold text-gray-600 datatables">
 
                             </tbody>
-
-                            {{-- <tbody class="fw-semibold text-gray-600">
-                                <tr>
-                                    <td class="text-end">
-                                        <a href="#"
-                                            class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary"
-                                            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                            <i class="ki-duotone ki-down fs-5 ms-1"></i></a>
-                                        <!--begin::Menu-->
-                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                            data-kt-menu="true">
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="apps/ecommerce/catalog/edit-product.html"
-                                                    class="menu-link px-3">Edit</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="#" class="menu-link px-3"
-                                                    data-kt-ecommerce-product-filter="delete_row">Delete</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                        </div>
-                                        <!--end::Menu-->
-                                    </td>
-                                </tr>
-                            </tbody> --}}
-
                         </table>
                         <!--end::Table-->
                     </div>
@@ -286,67 +218,6 @@
                 $('#input_search').val('');
                 loadpage(5, '');
             });
-
-            // more filter
-            $('#search_filter').on('click', function() {
-                let nomor = $('#nomor').val()
-                let uraian = $('#uraian').val()
-                let retensi = $('#retensi').val()
-                let pencipta = $('#pencipta').val()
-                let unit_pengolah = $('#unit_pengolah').val()
-                let lokal = $('#lokal').val()
-                let media = $('#media').val()
-                let tgl = $('#tgl').val()
-                let ket = $('#ket').val()
-                let kd_klasifikasi_id = $('#kd_klasifikasi_id').val()
-
-                const formData = {
-                    'nomor': nomor,
-                    'uraian': uraian,
-                    'retensi': retensi,
-                    'pencipta': pencipta,
-                    'unit_pengolah': unit_pengolah,
-                    'lokal': lokal,
-                    'media': media,
-                    'tgl': tgl,
-                    'ket': ket,
-                    'kd_klasifikasi_id': kd_klasifikasi_id
-                }
-                loadpage(5, formData)
-
-            });
-
-            // proses delete data
-            $('body').on('click', '.deleteData', function() {
-                var id = $(this).data("id");
-                Swal.fire({
-                    title: "Are you sure to Delete?",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, delete it!"
-                }).then(function(result) {
-                    if (result.value) {
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            type: "DELETE",
-                            url: '{{ url("admin/$title") }}/' + id,
-                            success: function(data) {
-                                loadpage(5, '');
-                                toastr.success("Successful delete data!");
-                            },
-                            error: function(data) {
-                                toastr.error("Failed delete data!");
-                            }
-                        });
-                    }
-                });
-            });
-
-
-
-
         });
     </script>
 @endpush

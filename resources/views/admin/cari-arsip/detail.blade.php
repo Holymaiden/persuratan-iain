@@ -81,7 +81,8 @@
                             {{-- untuk tabel kode klasifikasi --}}
                             <div class="col-md-6 fv-row">
                                 <label class="fs-2 fw-bold mb-2">Kode Klasifikasi</label>
-                                <p class="fs-3 fw-semibold mb-2"> {{ $data->klasifikasi->jenis_klasifikasi->kode . '.' . $data->klasifikasi->nomor }} -
+                                <p class="fs-3 fw-semibold mb-2">
+                                    {{ $data->klasifikasi->jenis_klasifikasi->kode . '.' . $data->klasifikasi->nomor }} -
                                     {{ $data->klasifikasi->nama }}</p>
                             </div>
 
@@ -227,19 +228,27 @@
 
 
         function validateFile(fld) {
-            // if (!/(\.pdf)$/i.test(fld.value)) {
-            //     Swal.fire('File Tidak Valid !', 'File Harus Berupa PDF', 'error')
-            //     fld.value = "";
-            //     fld.focus();
-            //     return (false);
-            // }
-            if (fld.files[0].size / 1024 / 1024 > 2) {
-                Swal.fire('File terlalu besar !', 'maksimum ukuran file : 2 MB', 'error')
+            const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'application/pdf',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            const file = fld.files[0];
+            if (!file) return true;
+
+            if (file.size / 1024 / 1024 > 2) {
+                Swal.fire('File terlalu besar !', 'maksimum ukuran file : 2 MB', 'error');
                 fld.value = "";
                 fld.focus();
-                return (false);
+                return false;
             }
-            return (true);
+
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire('Format file tidak didukung!', 'Hanya boleh: PNG, JPG, JPEG, PDF, DOCX', 'error');
+                fld.value = "";
+                fld.focus();
+                return false;
+            }
+
+            return true;
         }
     </script>
 @endpush

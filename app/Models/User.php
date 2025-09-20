@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Role', 'id', 'id_role');
     }
+
+    public function logSurat()
+    {
+        return $this->hasMany('App\Models\log_surat', 'user_id', 'id');
+    }
 }

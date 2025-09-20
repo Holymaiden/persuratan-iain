@@ -56,7 +56,12 @@
                 {{ $v->ket_keaslian }} {{-- Tanggal Input --}}
             </span>
         </td>
-        @if (empty($v->file))
+        <td>
+            <span class="fw-semibold">
+                {{ $v->perihal }}
+            </span>
+        </td>
+        @if (empty($v->file) || $v->file == '-')
             <td>
                 <span class="fw-semibold">
                     Tidak ada file

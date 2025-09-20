@@ -82,7 +82,7 @@
                         @foreach (Session::get('menu') as $menu)
                             @if ($menu['parent'] == $mm['id'])
                                 @if ($menu['active'] == '1')
-                                    @if (auth()->user()->id_role == '3')
+                                    @if (auth()->user()->role_id == '3')
                                         @if (
                                             $menu['name'] == 'Daftar Kemampuan' ||
                                                 $menu['name'] == 'Permohonan Selesai' ||

@@ -145,7 +145,7 @@ class Helper
         // Format rentang waktu
         return $interval->y . ' Tahun';
     }
-    
+
     public static function suratkadaluarsa()
     {
 
@@ -235,7 +235,10 @@ class Helper
         switch ($param) {
             case 'kd_klasifikasis':
                 // Gunakan model Eloquent untuk KdKlasifikasi dan include relasi 'jenis_klasifikasi'
-                $data = kd_klasifikasi::with('jenis_klasifikasi')->get();
+                $data = kd_klasifikasi::with('jenis_klasifikasi')
+                    ->orderBy('jenis_klasifikasi_id')
+                    ->orderBy('nomor')
+                    ->get();
                 break;
 
             case 'jenis_klasifikasis':

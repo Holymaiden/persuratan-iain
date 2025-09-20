@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SuratKeluarController;
 use App\Http\Controllers\Admin\UserMenuController;
 use App\Http\Controllers\Admin\UsersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AktivitasPenggunaController;
 
 
 use App\Http\Controllers\Auth\LoginController as Auths;
@@ -120,7 +121,6 @@ Route::domain('')->group(function (): void {
             Route::post('/last-number', [SuratKeluarController::class, 'getLastNumber'])->name('surat-keluar.last-number');
             Route::get('/arsip/{id}', [SuratKeluarController::class, 'storeArsip'])->name('surat-keluar.arsip');
             Route::post('/get-no-surat-data', [SuratKeluarController::class, 'getNoSuratData'])->name('get.no.surat.data');
-
         });
 
         // Log aktivitas
@@ -199,6 +199,12 @@ Route::domain('')->group(function (): void {
             Route::put('/{id}', [UsersController::class, 'update'])->name('users.update');
             Route::delete('/{id}', [UsersController::class, 'destroy'])->name('users.delete');
             Route::get('/profile/{id}', [UsersController::class, 'profile'])->name('users.profile');
+        });
+
+        // Arsip surat
+        Route::group(['prefix' => '/aktivitas-pengguna'], function (): void {
+            Route::get('/', [AktivitasPenggunaController::class, 'index'])->name('aktivitas-pengguna.index');
+            Route::get('/data', [AktivitasPenggunaController::class, 'data'])->name('aktivitas-pengguna.data');
         });
     });
 });
