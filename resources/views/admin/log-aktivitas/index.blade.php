@@ -53,6 +53,20 @@
                         <!--end::Title-->
                         <!--begin::Toolbar-->
                         <div class="card-toolbar m-0">
+                            <!--begin::Filter-->
+                            <div class="d-flex align-items-center">
+                                <label class="form-label fw-bold text-dark fs-6 me-3">Filter Tanggal:</label>
+                                <input type="date" id="dateFilter" class="form-control form-control-sm w-150px"
+                                    value="{{ Carbon\Carbon::today()->toDateString() }}">
+                                <button type="button" id="filterBtn" class="btn btn-sm btn-primary ms-2">
+                                    <i class="ki-duotone ki-magnifier fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Filter
+                                </button>
+                            </div>
+                            <!--end::Filter-->
                             {{-- <!--begin::Tab nav-->
                             <ul class="nav nav-tabs nav-line-tabs nav-stretch fs-6 border-0 fw-bold" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -112,7 +126,7 @@
 @endsection
 
 @php
-    $routeName = $title . '.data';   
+    $routeName = $title . '.data';
 @endphp
 
 @push('jsScript')
@@ -131,9 +145,14 @@
                 last: '&#8677;',
             };
             $pagination.twbsPagination(defaultOpts);
-            function loaddata() {
+
+            function loaddata(date = null) {
+                let url = '{{ route($routeName) }}';
+                if (date) {
+                    url += '?date=' + date;
+                }
                 $.ajax({
-                    url: '{{ route($routeName) }}',
+                    url: url,
                     type: "GET",
                     datatype: "json",
                     success: function(data) {
@@ -143,9 +162,13 @@
                 });
             }
 
-            function loadpage() {
+            function loadpage(date = null) {
+                let url = '{{ route($routeName) }}';
+                if (date) {
+                    url += '?date=' + date;
+                }
                 $.ajax({
-                    url: '{{ route($routeName) }}',
+                    url: url,
                     type: "GET",
                     datatype: "json",
                     success: function(response) {
@@ -153,13 +176,37 @@
                             $pagination.twbsPagination('destroy');
                             $(".datatables").html('<tr><td colspan="4">Data not found</td></tr>');
                         }
-                        loaddata();
+                        loaddata(date);
                     }
                 });
             }
 
+            // Handle filter button click
+            $('#filterBtn').click(function() {
+                const selectedDate = $('#dateFilter').val();
+                if (selectedDate) {
+                    loadpage(selectedDate);
+                } else {
+                    loadpage();
+                }
+            });
 
+            // Handle enter key on date input
+            $('#dateFilter').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#filterBtn').click();
+                }
+            });
 
+            // Handle date input change
+            $('#dateFilter').change(function() {
+                const selectedDate = $(this).val();
+                if (selectedDate) {
+                    loadpage(selectedDate);
+                } else {
+                    loadpage();
+                }
+            });
 
         });
     </script>

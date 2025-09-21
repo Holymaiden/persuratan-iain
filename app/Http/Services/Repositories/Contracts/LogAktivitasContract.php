@@ -10,9 +10,11 @@ interface LogAktivitasContract
 	/**
 	 * params string $search
 	 * @return Collection
-	*/
+	 */
 
 	public function paginated(array $request);
 
 	public function allDesc();
+
+	public function filterByDate($date);
 }

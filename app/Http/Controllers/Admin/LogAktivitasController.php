@@ -28,13 +28,14 @@ class LogAktivitasController extends Controller
         }
     }
 
-    
+
     public function data(Request $request)
     {
         try {
             $title = $this->title;
-            $data = $this->repo->allDesc();
-            $view = view('admin.' . $title . '.data', compact('data', 'title'))->render();
+            $date = $request->get('date', Carbon::today()->toDateString());
+            $data = $this->repo->filterByDate($date);
+            $view = view('admin.' . $title . '.data', compact('data', 'title', 'date'))->render();
             return response()->json([
                 "html"       => $view,
             ]);

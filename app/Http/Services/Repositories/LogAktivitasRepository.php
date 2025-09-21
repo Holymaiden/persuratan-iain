@@ -26,8 +26,16 @@ class LogAktivitasRepository extends BaseRepository implements LogAktivitasContr
 		return $this->model->orderBy($field, $sortOrder)->paginate($perPage);
 	}
 
-	public function allDesc() {
+	public function allDesc()
+	{
 		return $this->model->orderByDesc('id')->get();
 	}
 
+	public function filterByDate($date)
+	{
+		return $this->model
+			->whereDate('created_at', $date)
+			->orderByDesc('id')
+			->get();
+	}
 }
