@@ -88,6 +88,98 @@
                                                 $menu['name'] == 'Permohonan Selesai' ||
                                                 $menu['name'] == 'Permohonan Batal' ||
                                                 $menu['name'] == 'Permohonan Inhouse')
+                                            @if ($menu['sub_parent'] == '1')
+                                                <!--begin:Menu item with submenu-->
+                                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                                    <!--begin:Menu link-->
+                                                    <span class="menu-link">
+                                                        <span class="menu-icon">
+                                                            <i class="bi {{ $menu['icon'] }} fs-3"></i>
+                                                        </span>
+                                                        <span
+                                                            class="menu-title">{{ $menu['name'] == 'Permohonan Selesai' ? 'Permohonan' : $menu['name'] }}</span>
+                                                        <span class="menu-arrow"></span>
+                                                    </span>
+                                                    <!--end:Menu link-->
+                                                    <!--begin:Menu sub-->
+                                                    <div class="menu-sub menu-sub-accordion">
+                                                        @foreach (Session::get('sub_menu') as $sub)
+                                                            @if ($sub['parent'] == $menu['id'] && $sub['active'] == '1')
+                                                                <!--begin:Menu item-->
+                                                                <div class="menu-item">
+                                                                    <!--begin:Menu link-->
+                                                                    <a class="menu-link @stack($sub['url']) "
+                                                                        href="{{ url('admin/' . $sub['url']) }}">
+                                                                        <span class="menu-bullet">
+                                                                            <span class="bullet bullet-dot"></span>
+                                                                        </span>
+                                                                        <span
+                                                                            class="menu-title">{{ $sub['name'] }}</span>
+                                                                    </a>
+                                                                    <!--end:Menu link-->
+                                                                </div>
+                                                                <!--end:Menu item-->
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                    <!--end:Menu sub-->
+                                                </div>
+                                                <!--end:Menu item with submenu-->
+                                            @else
+                                                <!--begin:Menu item simple-->
+                                                <div class="menu-item">
+                                                    <!--begin:Menu link-->
+                                                    <a class="menu-link @stack($menu['url']) "
+                                                        href="{{ url('admin/' . $menu['url']) }}">
+                                                        <span class="menu-icon">
+                                                            <i class="bi {{ $menu['icon'] }} fs-3"></i>
+                                                        </span>
+                                                        <span
+                                                            class="menu-title">{{ $menu['name'] == 'Permohonan Selesai' ? 'Permohonan' : $menu['name'] }}</span>
+                                                    </a>
+                                                    <!--end:Menu link-->
+                                                </div>
+                                                <!--end:Menu item simple-->
+                                            @endif
+                                        @endif
+                                    @else
+                                        @if ($menu['sub_parent'] == '1')
+                                            <!--begin:Menu item with submenu-->
+                                            <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                                <!--begin:Menu link-->
+                                                <span class="menu-link">
+                                                    <span class="menu-icon">
+                                                        <i class="bi {{ $menu['icon'] }} fs-3"></i>
+                                                    </span>
+                                                    <span class="menu-title">{{ $menu['name'] }}</span>
+                                                    <span class="menu-arrow"></span>
+                                                </span>
+                                                <!--end:Menu link-->
+                                                <!--begin:Menu sub-->
+                                                <div class="menu-sub menu-sub-accordion">
+                                                    @foreach (Session::get('sub_menu') as $sub)
+                                                        @if ($sub['parent'] == $menu['id'] && $sub['active'] == '1')
+                                                            <!--begin:Menu item-->
+                                                            <div class="menu-item">
+                                                                <!--begin:Menu link-->
+                                                                <a class="menu-link @stack($sub['url']) "
+                                                                    href="{{ url('admin/' . $sub['url']) }}">
+                                                                    <span class="menu-bullet">
+                                                                        <span class="bullet bullet-dot"></span>
+                                                                    </span>
+                                                                    <span class="menu-title">{{ $sub['name'] }}</span>
+                                                                </a>
+                                                                <!--end:Menu link-->
+                                                            </div>
+                                                            <!--end:Menu item-->
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                                <!--end:Menu sub-->
+                                            </div>
+                                            <!--end:Menu item with submenu-->
+                                        @else
+                                            <!--begin:Menu item simple-->
                                             <div class="menu-item">
                                                 <!--begin:Menu link-->
                                                 <a class="menu-link @stack($menu['url']) "
@@ -95,24 +187,12 @@
                                                     <span class="menu-icon">
                                                         <i class="bi {{ $menu['icon'] }} fs-3"></i>
                                                     </span>
-                                                    <span
-                                                        class="menu-title">{{ $menu['name'] == 'Permohonan Selesai' ? 'Permohonan' : $menu['name'] }}</span>
+                                                    <span class="menu-title">{{ $menu['name'] }}</span>
                                                 </a>
                                                 <!--end:Menu link-->
                                             </div>
+                                            <!--end:Menu item simple-->
                                         @endif
-                                    @else
-                                        <div class="menu-item">
-                                            <!--begin:Menu link-->
-                                            <a class="menu-link @stack($menu['url']) "
-                                                href="{{ url('admin/' . $menu['url']) }}">
-                                                <span class="menu-icon">
-                                                    <i class="bi {{ $menu['icon'] }} fs-3"></i>
-                                                </span>
-                                                <span class="menu-title">{{ $menu['name'] }}</span>
-                                            </a>
-                                            <!--end:Menu link-->
-                                        </div>
                                     @endif
                                 @endif
                             @endif

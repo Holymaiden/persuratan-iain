@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\ArsipSuratController;
+use App\Http\Controllers\Admin\ArsipSuratPindahController;
+use App\Http\Controllers\Admin\ArsipSuratPermanenController;
+use App\Http\Controllers\Admin\ArsipSuratMusnahController;
 use App\Http\Controllers\Admin\CariArsipController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataKlasifikasiController;
@@ -12,33 +15,17 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SuratKeluarController;
 use App\Http\Controllers\Admin\UserMenuController;
 use App\Http\Controllers\Admin\UsersController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AktivitasPenggunaController;
 
+use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController as Auths;
-use App\Models\NoSurat;
-use Illuminate\Support\Facades\Redirect;
-
-// Route::get('suratmasuk', SuratMasuk::class);
-
-// Route::get('/', function () {
-//     return view('app.welcome');
-// });
-
-// Auth::routes();
-
-// Route::resource('photos', PhotoController::class)->except(['create', 'store', 'update', 'destroy']);
-// Route::resource('photos', PhotoController::class)->only(['index', 'show']);
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('home');
-// Route::get('/', [DashboardController::class, 'home'])->name('index');
 Route::get('/data', [DashboardController::class, 'data'])->name('index.data');
 
 
 Route::domain('')->group(function (): void {
-    // Auth::routes();
-
     Route::get('/auth/login', [Auths::class, 'index'])->name('admin.login');
     Route::post('/auth/login', [Auths::class, 'login'])->name('login');
     Route::get('/auth/reset', [Auths::class, 'reset'])->name('reset');
@@ -86,6 +73,9 @@ Route::domain('')->group(function (): void {
             Route::get('/{id}/edit', [ArsipSuratController::class, 'edit'])->name('arsip.edit');
             Route::put('/{id}', [ArsipSuratController::class, 'update'])->name('arsip.update');
             Route::delete('/{id}', [ArsipSuratController::class, 'destroy'])->name('arsip.delete');
+            Route::post('/update-status', [ArsipSuratController::class, 'updateStatus'])->name('arsip.update-status');
+            Route::post('/bulk-update-status', [ArsipSuratController::class, 'bulkUpdateStatus'])->name('arsip.bulk-update-status');
+            Route::post('/bulk-revert-status', [ArsipSuratController::class, 'bulkRevertStatus'])->name('arsip.bulk-revert-status');
         });
 
         // Pencarian arsip surat
@@ -104,6 +94,30 @@ Route::domain('')->group(function (): void {
             Route::delete('/{id}', [CariArsipController::class, 'destroy'])->name('cari-arsip.delete');
         });
 
+        // Arsip surat pindah
+        Route::group(['prefix' => '/arsip-pindah'], function (): void {
+            Route::get('/', [ArsipSuratPindahController::class, 'index'])->name('arsip-pindah.index');
+            Route::get('/filter', [ArsipSuratPindahController::class, 'filter'])->name('arsip-pindah.filter');
+            Route::get('/data', [ArsipSuratPindahController::class, 'data'])->name('arsip-pindah.data');
+            Route::post('/bulk-update-status', [ArsipSuratPindahController::class, 'bulkUpdateStatus'])->name('arsip-pindah.bulk-update-status');
+            Route::post('/bulk-revert-status', [ArsipSuratPindahController::class, 'bulkRevertStatus'])->name('arsip-pindah.bulk-revert-status');
+        });
+
+        // Arsip surat permanen
+        Route::group(['prefix' => '/arsip-permanen'], function (): void {
+            Route::get('/', [ArsipSuratPermanenController::class, 'index'])->name('arsip-permanen.index');
+            Route::get('/filter', [ArsipSuratPermanenController::class, 'filter'])->name('arsip-permanen.filter');
+            Route::get('/data', [ArsipSuratPermanenController::class, 'data'])->name('arsip-permanen.data');
+            Route::post('/bulk-revert-status', [ArsipSuratPermanenController::class, 'bulkRevertStatus'])->name('arsip-permanen.bulk-revert-status');
+        });
+
+        // Arsip surat musnah
+        Route::group(['prefix' => '/arsip-musnah'], function (): void {
+            Route::get('/', [ArsipSuratMusnahController::class, 'index'])->name('arsip-musnah.index');
+            Route::get('/filter', [ArsipSuratMusnahController::class, 'filter'])->name('arsip-musnah.filter');
+            Route::get('/data', [ArsipSuratMusnahController::class, 'data'])->name('arsip-musnah.data');
+            Route::post('/bulk-revert-status', [ArsipSuratMusnahController::class, 'bulkRevertStatus'])->name('arsip-musnah.bulk-revert-status');
+        });
 
 
         Route::group(['prefix' => '/surat-keluar'], function (): void {

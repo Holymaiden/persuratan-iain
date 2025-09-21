@@ -4,10 +4,7 @@
             <!-- Checkbox untuk selection -->
             <div class="form-check form-check-sm form-check-custom form-check-solid">
                 <input class="form-check-input arsip-checkbox" type="checkbox" value="{{ $v->id }}"
-                    data-pindah-aktif="{{ $v->pindah_aktif ? '1' : '0' }}"
-                    data-permanent-aktif="{{ $v->permanent_aktif ? '1' : '0' }}"
-                    data-musnah-aktif="{{ $v->musnah_aktif ? '1' : '0' }}"
-                    data-revert-aktif="{{ $v->revert_aktif ? '1' : '0' }}" data-status="{{ $v->status }}">
+                    data-status="{{ $v->status }}">
             </div>
         </td>
         <td>
@@ -35,26 +32,6 @@
                 @endif
             </span>
         </td>
-        {{-- <td>
-            <span class="fw-semibold">
-                {{ $v->perihal }}
-            </span>
-        </td>
-        <td>
-            <span class="fw-semibold">
-                {{ $v->unit_pengolah }} 
-            </span>
-        </td>
-        <td>
-            <span class="fw-semibold">
-                {{ $v->lokal }} 
-            </span>
-        </td>
-        <td>
-            <span class="fw-semibold">
-                {{ $v->jenis_media }} 
-            </span>
-        </td> --}}
         <td>
             <span class="fw-semibold">
                 {!! $v->uraian !!}
@@ -90,11 +67,6 @@
                 </span>
             </td>
         @endif
-        {{-- <td>
-            <span class="fw-semibold">
-                {{ $v->no_rak }} 
-            </span>
-        </td> --}}
         <td>
             <span class="fw-semibold">
                 {{ $v->jumlah }} {{-- TTD --}}
@@ -105,12 +77,6 @@
                 {{ $v->no_box }}
             </span>
         </td>
-        {{-- 
-        <td>
-            <span class="fw-semibold">
-                {{ $v->pencipta }} 
-            </span>
-        </td> --}}
         <td>
             <span class="fw-semibold text-nowrap">
                 {{ Helper::getRentangTanggal($v->tgl, $v->retensi) }} ( Aktif Hingga
@@ -122,39 +88,16 @@
         </td>
         <td>
             <!-- Status Badge -->
-            <span
-                class="badge badge-{{ $v->status == 'arsip' ? 'primary' : ($v->status == 'pindah' ? 'warning' : ($v->status == 'musnah' ? 'danger' : 'success')) }}">
+            <span class="badge badge-warning">
                 {{ ucfirst($v->status) }}
             </span>
 
             <!-- Available Actions Info -->
             <div class="mt-1">
-                @if ($v->pindah_aktif && $v->status == 'arsip')
-                    <small class="text-muted d-block">✓ Dapat dipindah</small>
-                @endif
-                @if ($v->permanent_aktif && $v->status == 'arsip')
-                    <small class="text-muted d-block">✓ Dapat dipermanenkan</small>
-                @endif
-                @if ($v->musnah_aktif && $v->status == 'arsip')
-                    <small class="text-muted d-block">✓ Dapat dimusnahkan</small>
-                @endif
-                @if ($v->revert_aktif)
-                    <small class="text-muted d-block">✓ Dapat dikembalikan</small>
-                @endif
+                <small class="text-muted d-block">✓ Dapat diubah ke Permanen</small>
+                <small class="text-muted d-block">✓ Dapat diubah ke Musnah</small>
+                <small class="text-muted d-block">✓ Dapat dikembalikan ke Arsip</small>
             </div>
-        </td>
-        <td class="text-nowrap">
-            <a href="{{ route('arsip.detail', $v->id) }}" target="_blank" data-toggle="tooltip" data-id="' . $id . '"
-                title="Detail" class="DetailData me-1">
-                <button type="button" class="btn btn-icon btn-bg-secondary btn-active-color-warning btn-sm">
-                    <i class="ki-duotone ki-information fs-2">
-                        <span class="path1"></span>
-                        <span class="path2"></span>
-                        <span class="path3"></span>
-                    </i>
-                </button>
-            </a>
-            {!! Helper::btnAction($v->id, $title) !!} {{-- Tombol aksi --}}
         </td>
     </tr>
 @endforeach

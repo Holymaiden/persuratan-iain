@@ -211,7 +211,7 @@ class CariArsipController extends Controller
             $title = $this->title;
             $data = is_array($request->search) ? $this->repo->filter($request->all()) : $this->repo->all();
             $header = "Kearsipan Persuratan IAIN Parepare";
-            
+
             $pdf = Pdf::loadView('admin.' . $title . '.pdf', compact('header', 'data'));
             $pdf->setPaper('A4', 'landscape');
             $fileName = 'Cetak-Kearsipan-' . date('d-m-Y') . '.pdf';
@@ -222,7 +222,6 @@ class CariArsipController extends Controller
                 // 'pdf_url' => $pdf->stream($fileName)
                 'pdf_url' => asset("storage/{$fileName}")
             ]);
-
         } catch (\Exception $e) {
             return view('errors.message', ['message' => $e->getMessage()]);
         }
@@ -238,7 +237,6 @@ class CariArsipController extends Controller
             $fileName = 'Export-Kearsipan-' . date('d-m-Y') . '.xlsx';
 
             return Excel::download(new ArsipExport($data, $header), $fileName);
-
         } catch (\Exception $e) {
             return view('errors.message', ['message' => $e->getMessage()]);
         }

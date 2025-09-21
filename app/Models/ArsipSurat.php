@@ -26,29 +26,33 @@ class ArsipSurat extends Model
         'retensi2',
         'retensi3',
         'file',
-        'created_by', 
-        'updated_by', 
-        'tujuan', 
-		  'ttd', 
+        'created_by',
+        'updated_by',
+        'tujuan',
+        'ttd',
+        'status',
+        'tgl_pindah',
+        'tgl_musnah',
+        'tgl_permanent'
     ];
 
-    public function klasifikasi() {
+    public function klasifikasi()
+    {
         return $this->hasOne(kd_klasifikasi::class, 'id', 'kd_klasifikasi_id');
     }
 
-    // public function penciptaSurat() {
-    //     return $this->hasOne(JenisKlasifikasi::class, 'id', 'pencipta');
-    // }
-
-    public function cipta() {
+    public function cipta()
+    {
         return $this->hasOne(kd_unit::class, 'id', 'pencipta');
     }
 
-    public function unit() {
+    public function unit()
+    {
         return $this->hasOne(kd_unit::class, 'id', 'unit_pengolah');
     }
 
-    public function lokasi() {
+    public function lokasi()
+    {
         return $this->hasOne(kd_unit::class, 'id', 'lokal');
     }
 }

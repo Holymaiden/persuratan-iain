@@ -11,6 +11,7 @@ use App\Models\ArsipSurat;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use App\Models\UserMenu;
 use DateTime;
 
@@ -44,16 +45,29 @@ class Helper
     {
         Session::forget('main_menu');
         Session::forget('menu');
+        Session::forget('sub_menu');
         Session::forget('roles');
+
+        if (!Auth::check()) {
+            return;
+        }
 
         $data = UserMenu::join('menus', 'menus.id', '=', 'user_menus.id_menu')
             ->select('menus.*', 'user_menus.read', 'user_menus.create', 'user_menus.read', 'user_menus.edit', 'user_menus.delete', 'user_menus.report')
-            ->where('user_menus.id_role', auth()->user()->id_role)
-            ->orderBy('menus.id', 'asc')->get();
+            ->where('user_menus.id_role', Auth::user()->id_role)
+            ->orderBy('menus.sort', 'asc')->get();
 
+        // Main menu (parent = 0)
         $main_menu = $data->where('parent', '0')->where('read', '1')->toArray();
+
+        // Sub menu yang parent != 0 dan sub_parent = 0 (sub menu biasa)
+        // ATAU sub menu yang parent != 0 dan sub_parent = 1 (sub parent yang bisa memiliki child)
         $menu = $data->where('parent', '<>', 0)->where('read', '1')->toArray();
-        // $sub_menu = $data->where('parent', '<>', 0)->where('read', '1')->toArray();
+
+        // Sub menu child (menu yang parent-nya adalah sub_parent = 1)
+        $sub_menu_ids = collect($data)->where('sub_parent', '1')->pluck('id')->toArray();
+        $sub_menu = $data->whereIn('parent', $sub_menu_ids)->where('read', '1')->toArray();
+
         $data = $data->toArray();
         $menuAll = [];
         // create session role menu
@@ -63,7 +77,7 @@ class Helper
 
         Session::put('main_menu', $main_menu);
         Session::put('menu', $menu);
-        // Session::put('sub_menu', $sub_menu);
+        Session::put('sub_menu', $sub_menu);
         Session::put('roles', $menuAll);
     }
 

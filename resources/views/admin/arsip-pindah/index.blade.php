@@ -1,13 +1,5 @@
 @extends('admin._layouts.index')
 
-{{-- @push('cssScript')
-    @include('admin._layouts.partial._css')
-@endpush --}}
-
-{{-- @push('Data Master')
-    here show
-@endpush --}}
-
 @push($title)
     active
 @endpush
@@ -61,29 +53,9 @@
                                     <i class="fa fa-sync"></i>
                                 </span>
                             </button>
-
-                            {{-- <button id="button_filter" class="btn btn-secondary">
-                                Pencarian lanjut
-                            </button> --}}
-
-                            {{-- <button id="button_hideFilter" class="btn btn-secondary">
-                                Sembunyikan pencarian
-                            </button> --}}
                         </div>
                     </div>
                     <!--end::Card title-->
-
-                    <!--begin::Card toolbar-->
-                    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-                        <a href="{{ route($title . '.create') }}" class="btn btn-success">
-                            <span class="btn-label">
-                                <i class="fa fa-plus"></i>
-                            </span>
-                            Add New
-                        </a>
-                    </div>
-
-                    <!--end::Card toolbar-->
 
                 </div>
 
@@ -95,13 +67,6 @@
                         <span class="fw-semibold text-gray-600">Terpilih: <span id="selected-count">0</span> arsip</span>
 
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-warning btn-sm" id="bulk-pindah-btn">
-                                <i class="ki-duotone ki-arrows-loop fs-3">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                                Ubah ke Pindah
-                            </button>
                             <button type="button" class="btn btn-success btn-sm" id="bulk-permanent-btn">
                                 <i class="ki-duotone ki-save-2 fs-3">
                                     <span class="path1"></span>
@@ -118,6 +83,13 @@
                                     <span class="path5"></span>
                                 </i>
                                 Ubah ke Musnah
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" id="bulk-revert-btn">
+                                <i class="ki-duotone ki-undo fs-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Kembalikan ke Arsip
                             </button>
                         </div>
 
@@ -148,55 +120,20 @@
                                     <th class="min-w-120px text-nowrap">Nomor Arsip</th>
                                     <th class="min-w-140px">Tanggal Arsip</th>
                                     <th class="min-w-120px text-nowrap">Kode Klasifikasi</th>
-                                    {{-- <th class="min-w-120px">Perihal Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Unit Pengolah Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Lokal Arsip</th> --}}
-                                    {{-- <th class="min-w-120px">Jenis Media Arsip</th> --}}
                                     <th class="min-w-300px">Uraian Arsip</th>
                                     <th class="min-w-120px">Keterangan</th>
                                     <th class="min-w-300px">Perihal</th>
                                     <th class="min-w-120px">File</th>
-                                    {{-- <th class="min-w-120px">Nomor Rak</th> --}}
                                     <th class="min-w-120px">Jumlah </th>
                                     <th class="min-w-120px text-nowrap">Nomor Box</th>
-                                    {{-- <th class="min-w-120px">Pencipta Arsip</th> --}}
                                     <th class="min-w-120px">Retensi</th>
                                     <th class="min-w-150px">Status</th>
-                                    <th class="text-end ">Actions</th>
                                 </tr>
                             </thead>
 
                             <tbody class="fw-semibold text-gray-600 datatables">
 
                             </tbody>
-
-                            {{-- <tbody class="fw-semibold text-gray-600">
-                                <tr>
-                                    <td class="text-end">
-                                        <a href="#"
-                                            class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary"
-                                            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                            <i class="ki-duotone ki-down fs-5 ms-1"></i></a>
-                                        <!--begin::Menu-->
-                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                            data-kt-menu="true">
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="apps/ecommerce/catalog/edit-product.html"
-                                                    class="menu-link px-3">Edit</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="#" class="menu-link px-3"
-                                                    data-kt-ecommerce-product-filter="delete_row">Delete</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                        </div>
-                                        <!--end::Menu-->
-                                    </td>
-                                </tr>
-                            </tbody> --}}
 
                         </table>
                         <!--end::Table-->
@@ -365,36 +302,6 @@
 
             });
 
-            // proses delete data
-            $('body').on('click', '.deleteData', function() {
-                var id = $(this).data("id");
-                Swal.fire({
-                    title: "Are you sure to Delete?",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, delete it!"
-                }).then(function(result) {
-                    if (result.value) {
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            type: "DELETE",
-                            url: '{{ url("admin/$title") }}/' + id,
-                            success: function(data) {
-                                var search = $('#input_search').val();
-                                var per_page = $('#perPage').val() ?? 5;
-                                loadpage(per_page, search);
-                                toastr.success("Successful delete data!");
-                            },
-                            error: function(data) {
-                                toastr.error("Failed to delete data!");
-                            }
-                        });
-                    }
-                });
-            });
-
             // Handle select all checkbox
             $('#select-all-checkbox').change(function() {
                 $('.arsip-checkbox').prop('checked', $(this).is(':checked'));
@@ -427,44 +334,22 @@
                     $('#bulk-actions').show();
                     $('#selected-count').text(count);
 
-                    // Check available actions for selected items
-                    let canPindah = false;
-                    let canPermanent = false;
-                    let canMusnah = false;
-
-                    selectedCheckboxes.each(function() {
-                        const checkbox = $(this);
-                        if (checkbox.data('pindah-aktif') == '1' && checkbox.data('status') === 'arsip') {
-                            canPindah = true;
-                        }
-                        if (checkbox.data('permanent-aktif') == '1' && checkbox.data('status') ===
-                            'arsip') {
-                            canPermanent = true;
-                        }
-                        if (checkbox.data('musnah-aktif') == '1' && checkbox.data('status') === 'arsip') {
-                            canMusnah = true;
-                        }
-                    });
-
-                    // Enable/disable buttons based on available actions
-                    $('#bulk-pindah-btn').prop('disabled', !canPindah);
-                    $('#bulk-permanent-btn').prop('disabled', !canPermanent);
-                    $('#bulk-musnah-btn').prop('disabled', !canMusnah);
+                    // For arsip-pindah: semua always active karena status pindah bisa diubah ke permanent/musnah atau direvert
+                    $('#bulk-permanent-btn').prop('disabled', false);
+                    $('#bulk-musnah-btn').prop('disabled', false);
+                    $('#bulk-revert-btn').prop('disabled', false);
                 } else {
                     $('#bulk-actions').hide();
                 }
             }
 
-            // Handle bulk status change
-            $('#bulk-pindah-btn, #bulk-permanent-btn, #bulk-musnah-btn').click(function() {
+            // Handle bulk status change to permanent/musnah
+            $('#bulk-permanent-btn, #bulk-musnah-btn').click(function() {
                 const buttonId = $(this).attr('id');
                 let status = '';
                 let statusText = '';
 
-                if (buttonId === 'bulk-pindah-btn') {
-                    status = 'pindah';
-                    statusText = 'Pindah';
-                } else if (buttonId === 'bulk-permanent-btn') {
+                if (buttonId === 'bulk-permanent-btn') {
                     status = 'permanent';
                     statusText = 'Permanen';
                 } else if (buttonId === 'bulk-musnah-btn') {
@@ -472,12 +357,14 @@
                     statusText = 'Musnah';
                 }
 
-                const selectedIds = getSelectedValidIds(status);
+                const selectedIds = $('.arsip-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
 
                 if (selectedIds.length === 0) {
                     Swal.fire({
                         title: 'Peringatan!',
-                        text: `Tidak ada arsip yang dapat diubah ke status ${statusText}`,
+                        text: 'Silakan pilih arsip terlebih dahulu',
                         icon: 'warning'
                     });
                     return;
@@ -485,7 +372,7 @@
 
                 Swal.fire({
                     title: 'Konfirmasi Perubahan Status Bulk',
-                    text: `Apakah Anda yakin ingin mengubah ${selectedIds.length} arsip menjadi status ${statusText}?`,
+                    text: `Apakah Anda yakin ingin mengubah ${selectedIds.length} arsip pindah menjadi status ${statusText}?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -500,6 +387,37 @@
                 });
             });
 
+            // Handle bulk revert
+            $('#bulk-revert-btn').click(function() {
+                const selectedIds = $('.arsip-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedIds.length === 0) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Silakan pilih arsip terlebih dahulu',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Konfirmasi Kembalikan Status Bulk',
+                    text: `Apakah Anda yakin ingin mengembalikan ${selectedIds.length} arsip pindah ke status Arsip?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Kembalikan!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        bulkRevertStatus(selectedIds);
+                    }
+                });
+            });
 
             // Clear selection
             $('#clear-selection-btn').click(function() {
@@ -508,29 +426,6 @@
                 updateBulkActions();
             });
 
-            // Get selected valid IDs based on action type
-            function getSelectedValidIds(actionType) {
-                const validIds = [];
-                $('.arsip-checkbox:checked').each(function() {
-                    const checkbox = $(this);
-                    const id = checkbox.val();
-
-                    if (actionType === 'pindah' && checkbox.data('pindah-aktif') == '1' && checkbox.data(
-                            'status') === 'arsip') {
-                        validIds.push(id);
-                    } else if (actionType === 'permanent' && checkbox.data('permanent-aktif') == '1' &&
-                        checkbox.data('status') === 'arsip') {
-                        validIds.push(id);
-                    } else if (actionType === 'musnah' && checkbox.data('musnah-aktif') == '1' && checkbox
-                        .data('status') === 'arsip') {
-                        validIds.push(id);
-                    } else if (actionType === 'revert' && checkbox.data('revert-aktif') == '1') {
-                        validIds.push(id);
-                    }
-                });
-                return validIds;
-            }
-
             // Bulk update status function
             function bulkUpdateStatus(ids, status) {
                 $.ajax({
@@ -538,7 +433,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     type: "POST",
-                    url: '{{ route('arsip.bulk-update-status') }}',
+                    url: '{{ route('arsip-pindah.bulk-update-status') }}',
                     data: {
                         ids: ids,
                         status: status
@@ -564,7 +459,53 @@
                         }
                     },
                     error: function(xhr) {
-                        var errorMsg = 'Terjadi kesalahan saat mengubah status arsip.';
+                        var errorMsg = 'Terjadi kesalahan saat mengubah status arsip pindah.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMsg,
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+
+            // Bulk revert status function
+            function bulkRevertStatus(ids) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: "POST",
+                    url: '{{ route('arsip-pindah.bulk-revert-status') }}',
+                    data: {
+                        ids: ids
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            // Clear selection and reload data
+                            clearSelectionAndReload();
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMsg = 'Terjadi kesalahan saat mengembalikan status arsip pindah.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMsg = xhr.responseJSON.message;
                         }
@@ -588,10 +529,6 @@
                 var per_page = $('#perPage').val() ?? 5;
                 loadpage(per_page, search);
             }
-
-
-
-
         });
     </script>
 @endpush

@@ -18,16 +18,24 @@ class ArsipSuratRepository extends BaseRepository implements ArsipSuratContract
 		$this->model = $model;
 	}
 
-	public function paginated(array $criteria)
+	public function paginated(array $criteria, $status = 'arsip')
 	{
 		$perPage = $criteria['per_page'] ?? 5;
 		$field = $criteria['sort_field'] ?? 'id';
 		$sortOrder = $criteria['sort_order'] ?? 'desc';
 		$search = $criteria['search'] ?? '';
-		return $this->model->when($search, function ($query) use ($search): void {
-			$query->where('nomor', 'like', "%" . $search . "%");
-			$query->orWhere('uraian', 'like', "%" . $search . "%");
-		})
+
+		return $this->model->select('*')
+			->selectRaw('CASE WHEN retensi < CURDATE() THEN true ELSE false END as pindah_aktif')
+			->selectRaw('CASE WHEN retensi2 < CURDATE() THEN true ELSE false END as permanent_aktif')
+			->selectRaw('CASE WHEN retensi2 < CURDATE() THEN true ELSE false END as musnah_aktif')
+			->selectRaw('CASE WHEN status IN ("pindah", "musnah", "permanent") THEN true ELSE false END as revert_aktif')
+			->when($search, function ($query) use ($search): void {
+				$query->where('nomor', 'like', "%" . $search . "%");
+				$query->orWhere('uraian', 'like', "%" . $search . "%");
+			})->when($status, function ($query) use ($status): void {
+				$query->where('status', '=', $status);
+			})
 			->orderBy($field, $sortOrder)
 			->paginate($perPage);
 	}
@@ -40,7 +48,7 @@ class ArsipSuratRepository extends BaseRepository implements ArsipSuratContract
 		return $this->model->orderBy($field, $sortOrder)->paginate($perPage);
 	}
 
-	public function filter(array $criteria)
+	public function filter(array $criteria, $status = 'arsip')
 	{
 		$perPage = $criteria['per_page'] ?? 5;
 		$field = $criteria['sort_field'] ?? 'id';
@@ -60,7 +68,11 @@ class ArsipSuratRepository extends BaseRepository implements ArsipSuratContract
 		$no_rak = $criteria['search']['no_rak'] ?? '';
 		$no_box = $criteria['search']['no_box'] ?? '';
 
-		$filter = $this->model;
+		$filter = $this->model->select('*')
+			->selectRaw('CASE WHEN retensi < CURDATE() THEN true ELSE false END as pindah_aktif')
+			->selectRaw('CASE WHEN retensi2 < CURDATE() THEN true ELSE false END as permanent_aktif')
+			->selectRaw('CASE WHEN retensi2 < CURDATE() THEN true ELSE false END as musnah_aktif')
+			->selectRaw('CASE WHEN status IN ("pindah", "musnah", "permanent") THEN true ELSE false END as revert_aktif');
 
 		if (!empty($kd_klasifikasi_id)) {
 			$filter = $filter->where('kd_klasifikasi_id', '=', $kd_klasifikasi_id);
@@ -114,9 +126,107 @@ class ArsipSuratRepository extends BaseRepository implements ArsipSuratContract
 			$filter = $filter->where('no_box', 'like', '%' . $no_box . '%');
 		}
 
+		if (!empty($status)) {
+			$filter = $filter->where('status', '=', $status);
+		}
+
 		$filter = $filter->orderBy($field, $sortOrder)->paginate($perPage);
 		return $filter;
 	}
 
 	public function getFile($request) {}
+
+	public function updateStatus($id, $status)
+	{
+		$arsip = $this->model->find($id);
+		if (!$arsip) {
+			return false;
+		}
+
+		$updateData = ['status' => $status];
+		$currentDate = now()->format('Y-m-d');
+
+		// Set tanggal berdasarkan status
+		switch ($status) {
+			case 'pindah':
+				$updateData['tgl_pindah'] = $currentDate;
+				break;
+			case 'musnah':
+				$updateData['tgl_musnah'] = $currentDate;
+				break;
+			case 'permanent':
+				$updateData['tgl_permanent'] = $currentDate;
+				break;
+		}
+
+		return $arsip->update($updateData);
+	}
+
+	public function revertStatus($id)
+	{
+		$arsip = $this->model->find($id);
+		if (!$arsip) {
+			return false;
+		}
+
+		$updateData = [
+			'status' => 'arsip',
+			'tgl_pindah' => null,
+			'tgl_musnah' => null,
+			'tgl_permanent' => null
+		];
+
+		return $arsip->update($updateData);
+	}
+
+	public function bulkUpdateStatus(array $ids, $status)
+	{
+		if (empty($ids) || !in_array($status, ['pindah', 'musnah', 'permanent'])) {
+			return false;
+		}
+
+		$updateData = ['status' => $status];
+		$currentDate = now()->format('Y-m-d');
+
+		// Set tanggal berdasarkan status
+		switch ($status) {
+			case 'pindah':
+				$updateData['tgl_pindah'] = $currentDate;
+				break;
+			case 'musnah':
+				$updateData['tgl_musnah'] = $currentDate;
+				break;
+			case 'permanent':
+				$updateData['tgl_permanent'] = $currentDate;
+				break;
+		}
+
+		try {
+			$affected = $this->model->whereIn('id', $ids)->update($updateData);
+			return $affected > 0;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+
+	public function bulkRevertStatus(array $ids)
+	{
+		if (empty($ids)) {
+			return false;
+		}
+
+		$updateData = [
+			'status' => 'arsip',
+			'tgl_pindah' => null,
+			'tgl_musnah' => null,
+			'tgl_permanent' => null
+		];
+
+		try {
+			$affected = $this->model->whereIn('id', $ids)->update($updateData);
+			return $affected > 0;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
 }

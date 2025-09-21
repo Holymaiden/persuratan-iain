@@ -245,4 +245,117 @@ class ArsipSuratController extends Controller
             return view('errors.message', ['message' => $e->getMessage()]);
         }
     }
+
+    public function updateStatus(Request $request)
+    {
+        try {
+            $id = $request->input('id');
+            $status = $request->input('status');
+
+            // Validasi input
+            if (!in_array($status, ['pindah', 'musnah', 'permanent'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid'
+                ], 400);
+            }
+
+            $result = $this->repo->updateStatus($id, $status);
+
+            if ($result) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Status arsip berhasil diubah menjadi ' . $status
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengubah status arsip'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        try {
+            $ids = $request->input('ids', []);
+            $status = $request->input('status');
+
+            // Validasi input
+            if (empty($ids) || !is_array($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan pilih minimal satu arsip'
+                ], 400);
+            }
+
+            if (!in_array($status, ['pindah', 'musnah', 'permanent'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid'
+                ], 400);
+            }
+
+            $result = $this->repo->bulkUpdateStatus($ids, $status);
+
+            if ($result) {
+                $count = count($ids);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Berhasil mengubah status {$count} arsip menjadi " . ucfirst($status)
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengubah status arsip'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkRevertStatus(Request $request)
+    {
+        try {
+            $ids = $request->input('ids', []);
+
+            // Validasi input
+            if (empty($ids) || !is_array($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan pilih minimal satu arsip'
+                ], 400);
+            }
+
+            $result = $this->repo->bulkRevertStatus($ids);
+
+            if ($result) {
+                $count = count($ids);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Berhasil mengembalikan {$count} arsip ke status Arsip"
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengembalikan status arsip'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
