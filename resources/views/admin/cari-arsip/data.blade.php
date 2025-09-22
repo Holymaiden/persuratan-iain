@@ -1,6 +1,16 @@
 @foreach ($data as $key => $v)
     <tr class="text-start text-gray-600 fs-7">
-
+        <td>
+            <div class="form-check form-check-sm form-check-custom form-check-solid">
+                <input class="form-check-input arsip-checkbox" type="checkbox" value="{{ $v->id }}"
+                    data-table="{{ $type }}"
+                    data-pindah-aktif="{{ isset($v->pindah_aktif) ? ($v->pindah_aktif ? '1' : '0') : '1' }}"
+                    data-permanent-aktif="{{ isset($v->permanent_aktif) ? ($v->permanent_aktif ? '1' : '0') : '1' }}"
+                    data-musnah-aktif="{{ isset($v->musnah_aktif) ? ($v->musnah_aktif ? '1' : '0') : '1' }}"
+                    data-revert-aktif="{{ isset($v->revert_aktif) ? ($v->revert_aktif ? '1' : '0') : '0' }}"
+                    data-status="{{ $type == 'Arsip' ? $v->status : $v->riwayat }}">
+            </div>
+        </td>
         <td>
             <span class="fw-semibold">
                 {{ ++$key }} {{-- Kode Klasifikasi --}}
@@ -127,6 +137,24 @@
                     {{ $v->retensi3 }} ( Nasib )<br>
                 </span>
             </span>
+
+
+            <!-- Available Actions Info -->
+            <div class="mt-1">
+                @if (($v->pindah_aktif && $v->status == 'arsip') || $v->riwayat == 'arsip')
+                    <small class="text-muted d-block">✓ Dapat dipindah</small>
+                @endif
+                @if (($v->permanent_aktif && $v->status == 'arsip') || $v->riwayat == 'arsip')
+                    <small class="text-muted d-block">✓ Dapat dipermanenkan</small>
+                @endif
+                @if (($v->musnah_aktif && $v->status == 'arsip') || $v->riwayat == 'arsip')
+                    <small class="text-muted d-block">✓ Dapat dimusnahkan</small>
+                @endif
+                @if ($v->revert_aktif)
+                    <small class="text-muted d-block">✓ Dapat dikembalikan</small>
+                @endif
+            </div>
+
         </td>
         <td class="text-nowrap text-center">
             @if ($type == 'Surat Keluar')

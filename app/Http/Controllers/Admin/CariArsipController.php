@@ -241,4 +241,84 @@ class CariArsipController extends Controller
             return view('errors.message', ['message' => $e->getMessage()]);
         }
     }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        try {
+            $ids = $request->input('ids', []);
+            $status = $request->input('status');
+            $tableType = $request->input('table_type');
+
+            // Validasi input
+            if (empty($ids) || !is_array($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan pilih minimal satu arsip'
+                ], 400);
+            }
+
+            if (!in_array($status, ['pindah', 'musnah', 'permanent'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status tidak valid'
+                ], 400);
+            }
+
+            $result = $this->repo->bulkUpdateStatus($ids, $status, $tableType);
+
+            if ($result) {
+                $count = count($ids);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Berhasil mengubah status {$count} arsip menjadi " . ucfirst($status)
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengubah status arsip'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkRevertStatus(Request $request)
+    {
+        try {
+            $ids = $request->input('ids', []);
+            $tableType = $request->input('table_type');
+
+            // Validasi input
+            if (empty($ids) || !is_array($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan pilih minimal satu arsip'
+                ], 400);
+            }
+
+            $result = $this->repo->bulkRevertStatus($ids, $tableType);
+
+            if ($result) {
+                $count = count($ids);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Berhasil mengembalikan status {$count} arsip ke status arsip"
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengembalikan status arsip'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -117,10 +117,10 @@
                                         </div>
                                     </th>
                                     <th class="min-w-20px pe-2">No</th>
-                                    <th class="min-w-120px text-nowrap">Nomor Arsip</th>
-                                    <th class="min-w-140px">Tanggal Arsip</th>
+                                    <th class="min-w-120px text-nowrap">Nomor</th>
+                                    <th class="min-w-140px">Tanggal</th>
                                     <th class="min-w-120px text-nowrap">Kode Klasifikasi</th>
-                                    <th class="min-w-300px">Uraian Arsip</th>
+                                    <th class="min-w-300px">Uraian</th>
                                     <th class="min-w-120px">Keterangan</th>
                                     <th class="min-w-300px">Perihal</th>
                                     <th class="min-w-120px">File</th>
@@ -129,6 +129,7 @@
                                     <th class="min-w-120px">Retensi</th>
                                     <th class="min-w-150px">Status</th>
                                     <th class="min-w-140px">Tanggal Pindah</th>
+                                    <th class="min-w-100px text-center">Action</th>
                                 </tr>
                             </thead>
 
@@ -165,6 +166,24 @@
         <!--end::Content container-->
     </div>
     <!--end::Content-->
+
+    <!-- Modal Detail Arsip -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Arsip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="detailModalBody">
+                    <!-- Detail content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('jsScript')
@@ -531,5 +550,27 @@
                 loadpage(per_page, search);
             }
         });
+
+        // Show detail function
+        function showDetail(id, tableType) {
+            $.ajax({
+                url: '{{ url('admin/arsip/detail') }}/' + id,
+                method: 'GET',
+                data: {
+                    table_type: tableType
+                },
+                success: function(response) {
+                    $('#detailModalBody').html(response.html);
+                    $('#detailModal').modal('show');
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Tidak dapat memuat detail arsip.',
+                        icon: 'error'
+                    });
+                }
+            })
+        }
     </script>
 @endpush

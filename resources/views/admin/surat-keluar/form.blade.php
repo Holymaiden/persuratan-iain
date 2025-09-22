@@ -247,7 +247,7 @@
                                     <input type="text" class="form-control" name="no_rak" placeholder="Nomor Rak"
                                         value="{{ isset($data->no_rak) ? $data->no_rak : '' }}" id="no_rak" />
                                 </div>
-                              
+
                                 <div class="col-md-6 fv-row">
                                     <label class="fs-6 fw-semibold mb-2">Nomor Box (opsional)</label>
 
@@ -622,6 +622,48 @@
             if (editTujuan && editTujuan?.length > 0) {
                 $("#tujuan").val(editTujuan).trigger("change")
             }
+
+        });
+
+        $(document).ready(function() {
+            // Inisialisasi select2
+            $('#asal').select2({
+                tags: true, // Memungkinkan input manual
+                placeholder: "Pilih Asal..."
+            });
+
+            const asalOption = $('.asal-lain');
+            const asalForm = $('#asalLain');
+            asalOption.hide();
+
+            // jika form edit
+            const getValueAsalOption = $('#asal option').filter((i, v) => {
+                return v.value == asalForm.val();
+            });
+
+            if (getValueAsalOption.length === 0 && asalForm.val() !== '') {
+                asalOption.show();
+                asalForm.val(asalForm.val());
+                $('#asal').val('20').change();
+            } else {
+                asalOption.hide();
+            }
+
+            $('#asal').on('change', function() {
+                let asalValue = $(this).val();
+                if (asalValue == '20') {
+                    asalOption.show();
+                } else {
+                    asalOption.hide();
+                }
+            });
+
+            const editAsal = "{{ isset($data->asal) ? $data->asal : '' }}";
+            if (editAsal && editAsal?.length > 0) {
+                $("#asal").val(editAsal).trigger("change")
+            }
+
+
 
         });
 

@@ -100,10 +100,10 @@
                                         </div>
                                     </th>
                                     <th class="min-w-20px pe-2">No</th>
-                                    <th class="min-w-120px text-nowrap">Nomor Arsip</th>
-                                    <th class="min-w-140px">Tanggal Arsip</th>
+                                    <th class="min-w-120px text-nowrap">Nomor</th>
+                                    <th class="min-w-140px">Tanggal</th>
                                     <th class="min-w-120px text-nowrap">Kode Klasifikasi</th>
-                                    <th class="min-w-300px">Uraian Arsip</th>
+                                    <th class="min-w-300px">Uraian</th>
                                     <th class="min-w-120px">Keterangan</th>
                                     <th class="min-w-300px">Perihal</th>
                                     <th class="min-w-120px">File</th>
@@ -113,6 +113,7 @@
                                     <th class="min-w-150px">Status</th>
                                     <th class="min-w-140px">Tanggal Pindah</th>
                                     <th class="min-w-140px">Tanggal Musnah</th>
+                                    <th class="min-w-130px text-center">Action</th>
                                 </tr>
                             </thead>
 
@@ -149,80 +150,101 @@
         <!--end::Content container-->
     </div>
     <!--end::Content-->
+
+    <!-- Modal Detail Arsip -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detail Arsip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="detailModalBody">
+                    <!-- Detail content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('jsScript')
     <script type="text/javascript">
-        $(document).ready(function() {
-            loadpage(5, '');
-            var $pagination = $('.twbs-pagination');
-            var defaultOpts = {
-                totalPages: 1,
-                prev: '&#8672;',
-                next: '&#8674;',
-                first: '&#8676;',
-                last: '&#8677;',
-            };
-            $pagination.twbsPagination(defaultOpts);
+        // Define global variables and functions
+        var $pagination;
+        var defaultOpts = {
+            totalPages: 1,
+            prev: '&#8672;',
+            next: '&#8674;',
+            first: '&#8676;',
+            last: '&#8677;',
+        };
 
-            function loaddata(page, per_page, search) {
-                $.ajax({
-                    url: '{{ route($title . '.data') }}',
-                    data: {
-                        "page": page,
-                        "per_page": per_page,
-                        "search": search,
-                    },
-                    type: "GET",
-                    datatype: "json",
-                    success: function(data) {
-                        $(".datatables").html(data.html);
+        function loaddata(page, per_page, search) {
+            $.ajax({
+                url: '{{ route($title . '.data') }}',
+                data: {
+                    "page": page,
+                    "per_page": per_page,
+                    "search": search,
+                },
+                type: "GET",
+                datatype: "json",
+                success: function(data) {
+                    $(".datatables").html(data.html);
+                }
+            });
+        }
+
+        function loadpage(per_page, search) {
+            $.ajax({
+                url: '{{ route($title . '.data') }}',
+                data: {
+                    "per_page": per_page,
+                    "search": search,
+                },
+                type: "GET",
+                datatype: "json",
+                success: function(response) {
+                    if ($pagination.data("twbs-pagination")) {
+                        $pagination.twbsPagination('destroy');
+                        $(".datatables").html('<tr><td colspan="4">Data not found</td></tr>');
                     }
-                });
-            }
-
-            function loadpage(per_page, search) {
-                $.ajax({
-                    url: '{{ route($title . '.data') }}',
-                    data: {
-                        "per_page": per_page,
-                        "search": search,
-                    },
-                    type: "GET",
-                    datatype: "json",
-                    success: function(response) {
-                        if ($pagination.data("twbs-pagination")) {
-                            $pagination.twbsPagination('destroy');
-                            $(".datatables").html('<tr><td colspan="4">Data not found</td></tr>');
-                        }
-                        $pagination.twbsPagination($.extend({}, defaultOpts, {
-                            startPage: 1,
-                            totalPages: response.total_page,
-                            visiblePages: 8,
-                            prev: '&#8672;',
-                            next: '&#8674;',
-                            first: '&#8676;',
-                            last: '&#8677;',
-                            onPageClick: function(event, page) {
-                                if (page == 1) {
-                                    var to = 1;
-                                } else {
-                                    var to = page * per_page - (per_page - 1);
-                                }
-                                if (page == response.total_page) {
-                                    var end = response.total_data;
-                                } else {
-                                    var end = page * per_page;
-                                }
-                                $('#contentPage').text('Showing ' + to + ' to ' + end +
-                                    ' of ' +
-                                    response.total_data + ' entries');
-                                loaddata(page, per_page, search);
+                    $pagination.twbsPagination($.extend({}, defaultOpts, {
+                        startPage: 1,
+                        totalPages: response.total_page,
+                        visiblePages: 8,
+                        prev: '&#8672;',
+                        next: '&#8674;',
+                        first: '&#8676;',
+                        last: '&#8677;',
+                        onPageClick: function(event, page) {
+                            if (page == 1) {
+                                var to = 1;
+                            } else {
+                                var to = page * per_page - (per_page - 1);
                             }
-                        }));
-                    }
-                });
-            }
+                            if (page == response.total_page) {
+                                var end = response.total_data;
+                            } else {
+                                var end = page * per_page;
+                            }
+                            $('#contentPage').text('Showing ' + to + ' to ' + end +
+                                ' of ' +
+                                response.total_data + ' entries');
+                            loaddata(page, per_page, search);
+                        }
+                    }));
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $pagination = $('.twbs-pagination');
+            loadpage(5, '');
+            $pagination.twbsPagination(defaultOpts);
 
             const filterForm = $('#filterArsip');
             const hideBtnFilter = $('#button_hideFilter')
@@ -389,5 +411,90 @@
 
             });
         });
+
+        // Show detail function
+        function showDetail(id, tableType) {
+            $.ajax({
+                url: '{{ url('admin/arsip/detail') }}/' + id,
+                method: 'GET',
+                data: {
+                    table_type: tableType
+                },
+                success: function(response) {
+                    $('#detailModalBody').html(response.html);
+                    $('#detailModal').modal('show');
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Tidak dapat memuat detail arsip.',
+                        icon: 'error'
+                    });
+                }
+            })
+        }
+
+        // Confirm delete function
+        function confirmDelete(id, tableType) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus arsip ini secara permanen? Aksi ini tidak dapat dibatalkan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteArsip(id, tableType);
+                }
+            });
+        }
+
+        // Delete function
+        function deleteArsip(id, tableType) {
+            $.ajax({
+                url: '{{ route('arsip-musnah.delete') }}',
+                method: 'DELETE',
+                data: {
+                    id: id,
+                    table_type: tableType,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success'
+                        }).then(() => {
+                            // Reload data using global loadpage function
+                            var search = $('#input_search').val();
+                            var per_page = $('#perPage').val() ?? 5;
+                            loadpage(per_page, search);
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Terjadi kesalahan saat menghapus arsip.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMsg,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     </script>
 @endpush

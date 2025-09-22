@@ -63,7 +63,6 @@
 
                     <!--end::Card toolbar-->
                 </div>
-
                 <!--end::Card header-->
 
                 <!--begin::Card body-->
@@ -382,6 +381,56 @@
                         </div>
                     </div>
 
+                    <!--begin::Bulk Actions-->
+                    <div class="align-items-center gap-3 mt-5 p-3 bg-light-info rounded border-dashed border-info"
+                        id="bulk-actions" style="display: none;">
+                        <div class="d-flex align-items-center">
+                            <i class="ki-duotone ki-check-square fs-2 text-info me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <span class="fw-bold text-info">Terpilih: <span id="selected-count">0</span> arsip</span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-warning btn-sm" id="bulk-pindah-btn">
+                                <i class="ki-duotone ki-arrows-loop fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Ubah ke Pindah
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" id="bulk-permanent-btn">
+                                <i class="ki-duotone ki-save-2 fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Ubah ke Permanen
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" id="bulk-musnah-btn">
+                                <i class="ki-duotone ki-trash fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                Ubah ke Musnah
+                            </button>
+
+                            <div class="separator-dashed mx-2"></div>
+
+                            <button type="button" class="btn btn-light-secondary btn-sm" id="clear-selection-btn">
+                                <i class="ki-duotone ki-cross fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Batal Pilih
+                            </button>
+                        </div>
+                    </div>
+                    <!--end::Bulk Actions-->
+
 
 
                     <div class="table-responsive mt-15">
@@ -390,6 +439,11 @@
                             id="kt_ecommerce_products_table">
                             <thead>
                                 <tr class="text-start text-gray-600 fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                            <input class="form-check-input" type="checkbox" id="select-all-checkbox" />
+                                        </div>
+                                    </th>
                                     <th class="min-w-20px pe-2">No</th>
                                     <th class="min-w-120px text-nowrap">Nomor</th>
                                     <th class="min-w-140px text-nowrap">Tanggal</th>
@@ -475,6 +529,275 @@
 
 @push('jsScript')
     <script type="text/javascript">
+        // Global variables
+        let type_surat = '';
+        let $pagination;
+        let defaultOpts;
+
+
+
+        // Global functions
+        function loadcetak(search = '') {
+            $.ajax({
+                url: '{{ route('cari-arsip.data.pdf') }}',
+                data: {
+                    "search": search,
+                },
+                type: "GET",
+                datatype: "json",
+                success: function(data) {
+                    if (data.pdf_url) {
+                        window.open(data.pdf_url, '_blank');
+                    } else {
+                        window.open(data.pdf_url, '_blank');
+                        console.error("PDF URL tidak ditemukan di respons");
+                    }
+                },
+                error: function(error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        function loadexport(search) {
+            const url = '{{ route('cari-arsip.data.export') }}' + '?search=' + encodeURIComponent(JSON
+                .stringify(
+                    search));
+            window.open(url, '_blank');
+            return
+        }
+
+        function loaddata(page, per_page, search) {
+            $.ajax({
+                url: '{{ route('cari-arsip' . '.data') }}',
+                data: {
+                    "page": page,
+                    "per_page": per_page,
+                    "search": search,
+                },
+                type: "GET",
+                datatype: "json",
+                success: function(data) {
+                    $(".datatables").html(data.html);
+                    type_surat = data.type
+                    // Reset bulk actions setelah data dimuat
+                    $('#bulk-actions').css('display', 'none');
+                    $('#select-all-checkbox').prop('checked', false);
+                    $('#selected-count').text(0);
+                }
+            });
+        }
+
+        function loadpage(per_page, search) {
+            $.ajax({
+                url: '{{ route('cari-arsip' . '.data') }}',
+                data: {
+                    "per_page": per_page,
+                    "search": search,
+                },
+                type: "GET",
+                datatype: "json",
+                success: function(response) {
+                    if ($pagination.data("twbs-pagination")) {
+                        $pagination.twbsPagination('destroy');
+                        $(".datatables").html('<tr><td colspan="4">Data not found</td></tr>');
+                    }
+                    $pagination.twbsPagination($.extend({}, defaultOpts, {
+                        startPage: 1,
+                        totalPages: response.total_page,
+                        visiblePages: 8,
+                        prev: '&#8672;',
+                        next: '&#8674;',
+                        first: '&#8676;',
+                        last: '&#8677;',
+                        onPageClick: function(event, page) {
+                            if (page == 1) {
+                                var to = 1;
+                            } else {
+                                var to = page * per_page - (per_page - 1);
+                            }
+                            if (page == response.total_page) {
+                                var end = response.total_data;
+                            } else {
+                                var end = page * per_page;
+                            }
+                            $('#contentPage').text('Showing ' + to + ' to ' + end +
+                                ' of ' +
+                                response.total_data + ' entries');
+                            loaddata(page, per_page, search);
+                        }
+                    }));
+
+                    // Reset bulk actions setelah pagination
+                    $('#bulk-actions').css('display', 'none');
+                    $('#select-all-checkbox').prop('checked', false);
+                    $('#selected-count').text(0);
+                }
+            });
+        }
+
+        // Get current filter data
+        function getFilterData() {
+            let nomor = $('#nomor').val()
+            let uraian = $('#uraian').val()
+            let retensi = $('#retensi').val()
+            let retensi2 = $('#retensi2').val()
+            let retensi3 = $('#retensi3').val()
+            let pencipta = $('#pencipta').val()
+            let jumlah = $('#jumlah').val()
+            let unit_pengolah = $('#unit_pengolah').val()
+            let lokal = $('#lokal').val()
+            let media = $('#media').val()
+            let tgl = $('#tgl').val()
+            let ket = $('#ket').val()
+            let kd_klasifikasi_id = $('#kd_klasifikasi_id').val()
+            let perihal = $('#perihal').val()
+            let no_rak = $('#no_rak').val()
+            let no_box = $('#no_box').val()
+            let dari_tanggal = $('#dari_tanggal').val()
+            let sampai_tanggal = $('#sampai_tanggal').val()
+            let type_surat = $('#type_surat').val()
+
+            const formData = {
+                'nomor': nomor || null,
+                'uraian': uraian || null,
+                'retensi': retensi || null,
+                'retensi2': retensi2 || null,
+                'retensi3': retensi3 || null,
+                'pencipta': pencipta || null,
+                'jumlah': jumlah || null,
+                'unit_pengolah': unit_pengolah || null,
+                'lokal': lokal || null,
+                'media': media || null,
+                'tgl': tgl || null,
+                'ket': ket || null,
+                'kd_klasifikasi_id': kd_klasifikasi_id || null,
+                'perihal': perihal || null,
+                'no_rak': no_rak || null,
+                'no_box': no_box || null,
+                'dari_tanggal': dari_tanggal || null,
+                'sampai_tanggal': sampai_tanggal || null,
+                'type_surat': type_surat || null,
+            }
+
+            let cekValue = Object.values(formData).every(v => v == '' || v == null || v == undefined);
+            return cekValue ? '' : formData;
+        }
+
+        // Clear selection and reload data
+        function clearSelectionAndReload() {
+            $('.arsip-checkbox, #select-all-checkbox').prop('checked', false);
+            $('#select-all-checkbox').prop('indeterminate', false);
+            updateBulkActions();
+
+            var search = getFilterData();
+            var per_page = $('#perPage').val() ?? 5;
+            loadpage(per_page, search);
+        }
+
+        // Update bulk actions visibility and button states
+        function updateBulkActions() {
+            const selectedCheckboxes = $('.arsip-checkbox:checked');
+            const count = selectedCheckboxes.length;
+
+
+            // Only show bulk actions if we have selections AND at least one is status 'arsip'
+            let hasArsipStatus = false;
+            let canPindah = false;
+            let canPermanent = false;
+            let canMusnah = false;
+
+            selectedCheckboxes.each(function() {
+                const checkbox = $(this);
+                const status = checkbox.data('status');
+
+                // Only consider items with status 'arsip'
+                if (status === 'arsip') {
+                    hasArsipStatus = true;
+
+                    if (checkbox.data('pindah-aktif') == '1') {
+                        canPindah = true;
+                    }
+                    if (checkbox.data('permanent-aktif') == '1') {
+                        canPermanent = true;
+                    }
+                    if (checkbox.data('musnah-aktif') == '1') {
+                        canMusnah = true;
+                    }
+                }
+            });
+
+            // Only show bulk actions if we have selections with 'arsip' status
+            if (count > 0 && hasArsipStatus) {
+                $('#bulk-actions').css('display', 'flex').css('align-items', 'center').css('gap', '1rem');
+                $('#selected-count').text(count);
+
+                // Enable/disable buttons based on available actions
+                $('#bulk-pindah-btn').prop('disabled', !canPindah);
+                $('#bulk-permanent-btn').prop('disabled', !canPermanent);
+                $('#bulk-musnah-btn').prop('disabled', !canMusnah);
+
+            } else {
+                $('#bulk-actions').css('display', 'none');
+                $('#selected-count').text(0);
+            }
+        }
+
+        // Bulk update status function
+        function bulkUpdateStatus(ids, status, tableType) {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                url: '{{ route('cari-arsip.bulk-update-status') }}',
+                data: {
+                    ids: ids,
+                    status: status,
+                    table_type: tableType
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        // Clear selection and reload data
+                        clearSelectionAndReload();
+
+                        // Additional reload to ensure fresh data
+                        setTimeout(function() {
+                            var search = getFilterData();
+                            var per_page = $('#perPage').val() ?? 5;
+                            loadpage(per_page, search);
+                        }, 500);
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Terjadi kesalahan saat mengubah status arsip.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMsg,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('.opsiLain').select2({
                 tags: true, // Memungkinkan input manual
@@ -482,9 +805,15 @@
                 allowClear: true,
             });
 
+            // Force hide bulk actions on page load
+            $('#bulk-actions').css('display', 'none');
+            $('#select-all-checkbox').prop('checked', false).prop('indeterminate', false);
+            $('#selected-count').text(0);
 
-
-            loadpage(5, '');
+            // Ensure bulk actions are hidden after DOM is ready
+            setTimeout(function() {
+                $('#bulk-actions').css('display', 'none');
+            }, 100);
 
             const filterForm = $('#filterArsip');
             const hideBtnFilter = $('#button_hideFilter')
@@ -506,8 +835,8 @@
                 resetFilter.val('')
             });
 
-            var $pagination = $('.twbs-pagination');
-            var defaultOpts = {
+            $pagination = $('.twbs-pagination');
+            defaultOpts = {
                 totalPages: 1,
                 prev: '&#8672;',
                 next: '&#8674;',
@@ -516,100 +845,14 @@
             };
             $pagination.twbsPagination(defaultOpts);
 
-            function loadcetak(search = '') {
-                $.ajax({
-                    url: '{{ route('cari-arsip.data.pdf') }}',
-                    data: {
-                        "search": search,
-                    },
-                    type: "GET",
-                    datatype: "json",
-                    success: function(data) {
-                        if (data.pdf_url) {
-                            window.open(data.pdf_url, '_blank');
-                        } else {
-                            window.open(data.pdf_url, '_blank');
-                            console.error("PDF URL tidak ditemukan di respons");
-                        }
-                    },
-                    error: function(error) {
-                        console.error("Error:", error);
-                    }
-                });
-            }
-
-            function loadexport(search) {
-                const url = '{{ route('cari-arsip.data.export') }}' + '?search=' + encodeURIComponent(JSON
-                    .stringify(
-                        search));
-                window.open(url, '_blank');
-                return
-            }
-
-            let type_surat = ''
-
-            function loaddata(page, per_page, search) {
-                $.ajax({
-                    url: '{{ route('cari-arsip' . '.data') }}',
-                    data: {
-                        "page": page,
-                        "per_page": per_page,
-                        "search": search,
-                    },
-                    type: "GET",
-                    datatype: "json",
-                    success: function(data) {
-                        $(".datatables").html(data.html);
-                        type_surat = data.type
-                    }
-                });
-            }
-
-            function loadpage(per_page, search) {
-                $.ajax({
-                    url: '{{ route('cari-arsip' . '.data') }}',
-                    data: {
-                        "per_page": per_page,
-                        "search": search,
-                    },
-                    type: "GET",
-                    datatype: "json",
-                    success: function(response) {
-                        if ($pagination.data("twbs-pagination")) {
-                            $pagination.twbsPagination('destroy');
-                            $(".datatables").html('<tr><td colspan="4">Data not found</td></tr>');
-                        }
-                        $pagination.twbsPagination($.extend({}, defaultOpts, {
-                            startPage: 1,
-                            totalPages: response.total_page,
-                            visiblePages: 8,
-                            prev: '&#8672;',
-                            next: '&#8674;',
-                            first: '&#8676;',
-                            last: '&#8677;',
-                            onPageClick: function(event, page) {
-                                if (page == 1) {
-                                    var to = 1;
-                                } else {
-                                    var to = page * per_page - (per_page - 1);
-                                }
-                                if (page == response.total_page) {
-                                    var end = response.total_data;
-                                } else {
-                                    var end = page * per_page;
-                                }
-                                $('#contentPage').text('Showing ' + to + ' to ' + end +
-                                    ' of ' +
-                                    response.total_data + ' entries');
-                                loaddata(page, per_page, search);
-                            }
-                        }));
-                    }
-                });
-            }
-
+            // Initialize page load
+            loadpage(5, '');
             $("#perPage").on('click change', function(event) {
                 let per_page = $('#perPage').val() || 5;
+                // Reset bulk actions before loading new data
+                $('#bulk-actions').css('display', 'none');
+                $('#select-all-checkbox').prop('checked', false);
+                $('#selected-count').text(0);
                 loadpage(per_page, '');
             });
 
@@ -644,8 +887,13 @@
                         }
                     }
                 });
-                loadpage(5, '');
 
+                // Reset bulk actions after clearing filters
+                $('#bulk-actions').css('display', 'none');
+                $('#select-all-checkbox').prop('checked', false);
+                $('#selected-count').text(0);
+
+                loadpage(5, '');
             });
 
             // more filter
@@ -985,5 +1233,95 @@
                 retensiWarning.style.display = 'none';
             }
         }
+
+        // Handle select all checkbox
+        $('#select-all-checkbox').change(function() {
+            $('.arsip-checkbox').prop('checked', $(this).is(':checked'));
+            updateBulkActions();
+        });
+
+        // Handle individual checkbox
+        $('body').on('change', '.arsip-checkbox', function() {
+            updateBulkActions();
+
+            // Update select all checkbox state
+            const totalCheckboxes = $('.arsip-checkbox').length;
+            const checkedCheckboxes = $('.arsip-checkbox:checked').length;
+
+            if (checkedCheckboxes === 0) {
+                $('#select-all-checkbox').prop('indeterminate', false).prop('checked', false);
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                $('#select-all-checkbox').prop('indeterminate', false).prop('checked', true);
+            } else {
+                $('#select-all-checkbox').prop('indeterminate', true);
+            }
+        });
+
+        // Handle bulk status change
+        $('#bulk-pindah-btn, #bulk-permanent-btn, #bulk-musnah-btn').click(function() {
+            const buttonId = $(this).attr('id');
+            let status = '';
+            let statusText = '';
+
+            if (buttonId === 'bulk-pindah-btn') {
+                status = 'pindah';
+                statusText = 'Pindah';
+            } else if (buttonId === 'bulk-permanent-btn') {
+                status = 'permanent';
+                statusText = 'Permanen';
+            } else if (buttonId === 'bulk-musnah-btn') {
+                status = 'musnah';
+                statusText = 'Musnah';
+            }
+
+            const selectedIds = [];
+            let tableType = '';
+
+            // Get selected IDs and determine table type - only process items with status 'arsip'
+            $('.arsip-checkbox:checked').each(function() {
+                const checkbox = $(this);
+                const itemStatus = checkbox.data('status');
+
+                // Only include items with status 'arsip'
+                if (itemStatus === 'arsip') {
+                    selectedIds.push(checkbox.val());
+                    if (!tableType) {
+                        tableType = checkbox.data('table');
+                    }
+                }
+            });
+
+            if (selectedIds.length === 0) {
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: `Tidak ada arsip dengan status 'arsip' yang dipilih`,
+                    icon: 'warning'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Konfirmasi Perubahan Status Bulk',
+                text: `Apakah Anda yakin ingin mengubah ${selectedIds.length} arsip menjadi status ${statusText}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `Ya, Ubah ke ${statusText}!`,
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    bulkUpdateStatus(selectedIds, status, tableType);
+                }
+            });
+        });
+
+        // Clear selection
+        $('#clear-selection-btn').click(function() {
+            $('.arsip-checkbox, #select-all-checkbox').prop('checked', false);
+            $('#select-all-checkbox').prop('indeterminate', false);
+            updateBulkActions();
+        });
     </script>
 @endpush

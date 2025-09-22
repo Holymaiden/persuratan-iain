@@ -25,6 +25,9 @@ class DashboardController extends Controller
                 'countMasuk' => surat_masuk::get()->count(),
                 'countKeluar' => surat_keluar::get()->count(),
                 'countArsip' => ArsipSurat::get()->count(),
+                'countStatusPermanent' => ArsipSurat::where('status', 'permanent')->get()->count() + surat_masuk::where('riwayat', 'permanent')->get()->count() + surat_keluar::where('riwayat', 'permanent')->get()->count(),
+                'countStatusMusnah' => ArsipSurat::where('status', 'musnah')->get()->count() + surat_masuk::where('riwayat', 'musnah')->get()->count() + surat_keluar::where('riwayat', 'musnah')->get()->count(),
+                'countStatusPindah' => ArsipSurat::where('status', 'pindah')->get()->count() + surat_masuk::where('riwayat', 'pindah')->get()->count() + surat_keluar::where('riwayat', 'pindah')->get()->count(),
             );
             return view('admin.dashboard', compact('data'));
         } catch (\Exception $e) {

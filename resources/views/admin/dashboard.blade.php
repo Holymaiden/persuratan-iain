@@ -151,6 +151,112 @@
                                     <!--end::Col-->
                                 </div>
                                 <!--end::Row-->
+                                <!--begin::Status Row-->
+                                <div class="row g-3 g-lg-6 mt-6">
+                                    <!--begin::Col-->
+                                    <div class="col-4">
+                                        <!--begin::Items-->
+                                        <div class="bg-light rounded-3 px-6 py-5 shadow-sm border border-gray-300">
+                                            <!--begin::Stats-->
+                                            <div class="d-flex align-items-center">
+                                                <!--begin::Symbol-->
+                                                <div class="symbol symbol-50px me-4">
+                                                    <div class="symbol-label bg-white rounded-circle">
+                                                        <i class="ki-duotone ki-archive fs-2x text-primary">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                                <!--end::Symbol-->
+                                                <!--begin::Info-->
+                                                <div class="flex-grow-1">
+                                                    <!--begin::Number-->
+                                                    <span
+                                                        class="text-dark fw-bold fs-1 lh-1 mb-2 d-block">{{ $data['countStatusPermanent'] }}</span>
+                                                    <!--end::Number-->
+                                                    <!--begin::Desc-->
+                                                    <span class="text-muted fw-semibold fs-7">Status Permanent</span>
+                                                    <!--end::Desc-->
+                                                </div>
+                                                <!--end::Info-->
+                                            </div>
+                                            <!--end::Stats-->
+                                        </div>
+                                        <!--end::Items-->
+                                    </div>
+                                    <!--end::Col-->
+                                    <!--begin::Col-->
+                                    <div class="col-4">
+                                        <!--begin::Items-->
+                                        <div class="bg-light rounded-3 px-6 py-5 shadow-sm border border-gray-300">
+                                            <!--begin::Stats-->
+                                            <div class="d-flex align-items-center">
+                                                <!--begin::Symbol-->
+                                                <div class="symbol symbol-50px me-4">
+                                                    <div class="symbol-label bg-white rounded-circle">
+                                                        <i class="ki-duotone ki-trash fs-2x text-gray-600">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                            <span class="path4"></span>
+                                                            <span class="path5"></span>
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                                <!--end::Symbol-->
+                                                <!--begin::Info-->
+                                                <div class="flex-grow-1">
+                                                    <!--begin::Number-->
+                                                    <span
+                                                        class="text-dark fw-bold fs-1 lh-1 mb-2 d-block">{{ $data['countStatusMusnah'] }}</span>
+                                                    <!--end::Number-->
+                                                    <!--begin::Desc-->
+                                                    <span class="text-muted fw-semibold fs-7">Status Musnah</span>
+                                                    <!--end::Desc-->
+                                                </div>
+                                                <!--end::Info-->
+                                            </div>
+                                            <!--end::Stats-->
+                                        </div>
+                                        <!--end::Items-->
+                                    </div>
+                                    <!--end::Col-->
+                                    <!--begin::Col-->
+                                    <div class="col-4">
+                                        <!--begin::Items-->
+                                        <div class="bg-light rounded-3 px-6 py-5 shadow-sm border border-gray-300">
+                                            <!--begin::Stats-->
+                                            <div class="d-flex align-items-center">
+                                                <!--begin::Symbol-->
+                                                <div class="symbol symbol-50px me-4">
+                                                    <div class="symbol-label bg-white rounded-circle">
+                                                        <i class="ki-duotone ki-arrow-right-left fs-2x text-info">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                                <!--end::Symbol-->
+                                                <!--begin::Info-->
+                                                <div class="flex-grow-1">
+                                                    <!--begin::Number-->
+                                                    <span
+                                                        class="text-dark fw-bold fs-1 lh-1 mb-2 d-block">{{ $data['countStatusPindah'] }}</span>
+                                                    <!--end::Number-->
+                                                    <!--begin::Desc-->
+                                                    <span class="text-muted fw-semibold fs-7">Status Pindah</span>
+                                                    <!--end::Desc-->
+                                                </div>
+                                                <!--end::Info-->
+                                            </div>
+                                            <!--end::Stats-->
+                                        </div>
+                                        <!--end::Items-->
+                                    </div>
+                                    <!--end::Col-->
+                                </div>
+                                <!--end::Status Row-->
                                 <div class="row mt-3">
                                     <div class="col-md-6 mt-3">
                                         <button id="pedoman" class="btn btn-primary">

@@ -90,6 +90,8 @@ Route::domain('')->group(function (): void {
             Route::get('/{id}/edit', [CariArsipController::class, 'edit'])->name('cari-arsip.edit');
             Route::put('/{id}', [CariArsipController::class, 'update'])->name('cari-arsip.update');
             Route::delete('/{id}', [CariArsipController::class, 'destroy'])->name('cari-arsip.delete');
+            Route::post('/bulk-update-status', [CariArsipController::class, 'bulkUpdateStatus'])->name('cari-arsip.bulk-update-status');
+            Route::post('/bulk-revert-status', [CariArsipController::class, 'bulkRevertStatus'])->name('cari-arsip.bulk-revert-status');
         });
 
         // Arsip surat pindah
@@ -115,6 +117,7 @@ Route::domain('')->group(function (): void {
             Route::get('/filter', [ArsipSuratMusnahController::class, 'filter'])->name('arsip-musnah.filter');
             Route::get('/data', [ArsipSuratMusnahController::class, 'data'])->name('arsip-musnah.data');
             Route::post('/bulk-revert-status', [ArsipSuratMusnahController::class, 'bulkRevertStatus'])->name('arsip-musnah.bulk-revert-status');
+            Route::delete('/delete', [ArsipSuratMusnahController::class, 'delete'])->name('arsip-musnah.delete');
         });
 
 

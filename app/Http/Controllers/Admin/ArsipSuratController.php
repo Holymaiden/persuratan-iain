@@ -197,13 +197,48 @@ class ArsipSuratController extends Controller
         }
     }
 
-    public function detail($id)
+    public function detail($id, Request $request)
     {
         try {
             $title = $this->title;
-            $data = $this->repo->find($id);
+            $tableType = $request->get('table_type', 'Arsip');
+
+            // Get data based on table type
+            if ($tableType === 'Surat Masuk') {
+                $data = \App\Models\surat_masuk::find($id);
+            } elseif ($tableType === 'Surat Keluar') {
+                $data = \App\Models\surat_keluar::find($id);
+            } else {
+                $data = $this->repo->find($id);
+            }
+
+            if (!$data) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
+
+            // Add table type to data
+            $data->table_type = $tableType;
+
+            // If it's an AJAX request, return HTML
+            if ($request->ajax()) {
+                $html = view('admin.arsip.detail-content', compact('data', 'tableType'))->render();
+                return response()->json([
+                    'success' => true,
+                    'html' => $html
+                ]);
+            }
+
             return view('admin.' . $title . '.detail', compact('title', 'data'));
         } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+            }
             return view('errors.message', ['message' => $e->getMessage()]);
         }
     }

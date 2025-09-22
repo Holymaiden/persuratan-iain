@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\Repositories\Contracts\ArsipSuratContract;
+use App\Http\Services\Repositories\Contracts\CariArsipContract;
 use Illuminate\Http\Request;
 
 class ArsipSuratPindahController extends Controller
 {
     protected $title, $repo, $response;
 
-    public function __construct(ArsipSuratContract $repo)
+    public function __construct(CariArsipContract $repo)
     {
         $this->title = 'arsip-pindah';
         $this->repo = $repo;
@@ -30,7 +30,7 @@ class ArsipSuratPindahController extends Controller
     {
         try {
             $title = $this->title;
-            $data = is_array($request->search) ? $this->repo->filter($request->all(), 'pindah') : $this->repo->paginated($request->all(), 'pindah');
+            $data = is_array($request->search) ? $this->repo->filterByStatus($request->all(), 'pindah') : $this->repo->paginatedByStatus($request->all(), 'pindah');
             $perPage = $request->per_page == '' ? 5 : $request->per_page;
             $view = view('admin.' . $title . '.data', compact('data', 'title'))->with('i', ($request->input('page', 1) -
                 1) * $perPage)->render();
@@ -47,7 +47,7 @@ class ArsipSuratPindahController extends Controller
     public function filter(Request $request)
     {
         try {
-            $data = $this->repo->filter($request->all(), 'pindah');
+            $data = $this->repo->filterByStatus($request->all(), 'pindah');
             return response()->json($data);
         } catch (\Exception $e) {
             return view('errors.message', ['message' => $e->getMessage()]);
@@ -76,7 +76,7 @@ class ArsipSuratPindahController extends Controller
                 ], 400);
             }
 
-            $result = $this->repo->bulkUpdateStatus($ids, $status);
+            $result = $this->repo->bulkUpdateStatus($ids, $status, 'Mixed');
 
             if ($result) {
                 $count = count($ids);
@@ -111,7 +111,7 @@ class ArsipSuratPindahController extends Controller
                 ], 400);
             }
 
-            $result = $this->repo->bulkRevertStatus($ids);
+            $result = $this->repo->bulkRevertStatus($ids, 'Mixed');
 
             if ($result) {
                 $count = count($ids);

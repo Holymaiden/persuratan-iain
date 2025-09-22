@@ -32,7 +32,11 @@ class surat_keluar extends Model
         'uraian',
         'created_by',
         'updated_by',
-		'status_arsip'
+		'status_arsip',
+        'riwayat',
+        'tgl_pindah',
+        'tgl_musnah',
+        'tgl_permanent',
     ];
 
     public function klasifikasi()
