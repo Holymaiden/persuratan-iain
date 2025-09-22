@@ -184,7 +184,12 @@ class CariArsipRepository extends BaseRepository implements CariArsipContract
 		}
 
 		if (!empty($dari_tanggal) || !empty($sampai_tanggal)) {
-			$filter = $filter->whereBetween('retensi2', [$dari_tanggal, $sampai_tanggal]);
+			if ($type === 'Arsip') {
+				$filter = $filter->whereBetween('tgl', [$dari_tanggal, $sampai_tanggal]);
+			} else {
+				// For Surat Masuk and Surat Keluar
+				$filter = $filter->whereBetween('tgl_surat', [$dari_tanggal, $sampai_tanggal]);
+			}
 		}
 
 		// Pengurutan dan paginasi
@@ -306,7 +311,12 @@ class CariArsipRepository extends BaseRepository implements CariArsipContract
 		}
 
 		if (!empty($dari_tanggal) || !empty($sampai_tanggal)) {
-			$filter = $filter->whereBetween('retensi2', [$dari_tanggal, $sampai_tanggal]);
+			if ($type === 'Arsip') {
+				$filter = $filter->whereBetween('tgl', [$dari_tanggal, $sampai_tanggal]);
+			} else {
+				// For Surat Masuk and Surat Keluar
+				$filter = $filter->whereBetween('tgl_surat', [$dari_tanggal, $sampai_tanggal]);
+			}
 		}
 
 		// Return semua data tanpa pagination untuk export

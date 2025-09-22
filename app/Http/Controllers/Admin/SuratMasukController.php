@@ -238,9 +238,8 @@ class SuratMasukController extends Controller
             //$req['updated_by'] = Auth::user()->id;
 
             if (!File::exists(public_path('uploads/ttd/surat-masuk/' . $data->upload_file))) {
-                return dd('file tidak ada');
+                $copy = File::copy(public_path('uploads/ttd/surat-masuk/' . $data->upload_file), public_path('uploads/arsip/' . $data->upload_file));
             }
-            $copy = File::copy(public_path('uploads/ttd/surat-masuk/' . $data->upload_file), public_path('uploads/arsip/' . $data->upload_file));
             try {
                 $update_data = $this->repo->update(['status_arsip' => 'arsip', 'updated_by' => Auth::user()->id], $id);
                 $store = $this->arsip->store($req);

@@ -111,6 +111,8 @@
                                     <th class="min-w-120px text-nowrap">Nomor Box</th>
                                     <th class="min-w-120px">Retensi</th>
                                     <th class="min-w-150px">Status</th>
+                                    <th class="min-w-140px">Tanggal Pindah</th>
+                                    <th class="min-w-140px">Tanggal Musnah</th>
                                 </tr>
                             </thead>
 

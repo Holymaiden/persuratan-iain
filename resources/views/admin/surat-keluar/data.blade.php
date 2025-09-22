@@ -53,9 +53,12 @@
             </span>
         </td>
         <td class="text-nowrap">
-            <span class="fw-bold badge badge-{{ $v->status_arsip == 'arsip' ? 'danger' : 'primary' }}">
+            <span
+                class="fw-bold badge badge-{{ $v->status_arsip == 'arsip' ? 'danger' : ($v->status_arsip == 'inaktif' ? 'warning' : 'primary') }}">
                 @if ($v->status_arsip == 'arsip')
                     Telah di arsipkan
+                @elseif ($v->status_arsip == 'inaktif')
+                    Telah inaktif
                 @else
                     Masih aktif
                 @endif

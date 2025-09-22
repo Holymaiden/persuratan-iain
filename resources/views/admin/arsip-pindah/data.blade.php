@@ -99,5 +99,10 @@
                 <small class="text-muted d-block">✓ Dapat dikembalikan ke Arsip</small>
             </div>
         </td>
+        <td>
+            <span class="fw-semibold text-nowrap">
+                {{ Helper::getDateIndo($v->tgl_pindah) }} {{-- Tanggal Pindah --}}
+            </span>
+        </td>
     </tr>
 @endforeach

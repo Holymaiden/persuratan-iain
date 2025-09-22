@@ -57,8 +57,6 @@ Route::domain('')->group(function (): void {
             Route::get('/arsip/{id}', [SuratMasukController::class, 'storeArsip'])->name('surat-masuk.arsip');
         });
 
-
-
         // Arsip surat
         Route::group(['prefix' => '/arsip'], function (): void {
             Route::get('/', [ArsipSuratController::class, 'index'])->name('arsip.index');

@@ -103,7 +103,7 @@
                                                                     <td>{{ $no++ }}
                                                                         <input type="hidden" value="{{ $v2->id }}">
                                                                     </td>
-                                                                    <td>{{ $v2->name }}</td>
+                                                                    <td>&nbsp;&nbsp;{{ $v2->name }}</td>
                                                                     <td width="9%">
                                                                         <div class="checkbox">
                                                                             <label>
@@ -154,6 +154,70 @@
                                                                         </div>
                                                                     </td> --}}
                                                                 </tr>
+                                                                {{-- Loop untuk Sub Menu Child --}}
+                                                                @foreach (Helper::getData('menus')->where('parent', $v2->id) as $v3)
+                                                                    <tr>
+                                                                        <td>{{ $no++ }}
+                                                                            <input type="hidden"
+                                                                                value="{{ $v3->id }}">
+                                                                        </td>
+                                                                        <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $v3->name }}
+                                                                        </td>
+                                                                        <td width="9%">
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input type="checkbox"
+                                                                                        class="i-grey-square"
+                                                                                        name="read{{ $v3->id }}"
+                                                                                        id="read{{ $v3->id }}">
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td width="9%">
+                                                                            <div class="checkbox"
+                                                                                style="margin-bottom: 0px; margin-top: 0px">
+                                                                                <label>
+                                                                                    <input type="checkbox"
+                                                                                        class="i-grey-square"
+                                                                                        name="create{{ $v3->id }}"
+                                                                                        id="create{{ $v3->id }}">
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td width="9%">
+                                                                            <div class="checkbox"
+                                                                                style="margin-bottom: 0px; margin-top: 0px">
+                                                                                <label>
+                                                                                    <input type="checkbox"
+                                                                                        class="i-grey-square"
+                                                                                        name="edit{{ $v3->id }}"
+                                                                                        id="edit{{ $v3->id }}">
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td width="9%">
+                                                                            <div class="checkbox"
+                                                                                style="margin-bottom: 0px; margin-top: 0px">
+                                                                                <label>
+                                                                                    <input type="checkbox"
+                                                                                        class="i-grey-square"
+                                                                                        name="delete{{ $v3->id }}"
+                                                                                        id="delete{{ $v3->id }}">
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        {{-- <td width="9%">
+                                                                            <div class="checkbox"
+                                                                                style="margin-bottom: 0px; margin-top: 0px">
+                                                                                <label>
+                                                                                    <input type="checkbox" class="i-grey-square"
+                                                                                        name="report{{ $v3->id }}"
+                                                                                        id="report{{ $v3->id }}">
+                                                                                </label>
+                                                                            </div>
+                                                                        </td> --}}
+                                                                    </tr>
+                                                                @endforeach
                                                             @endforeach
                                                         @endif
                                                     @endforeach
@@ -292,7 +356,7 @@
         $(form.querySelector('[name="id_role"]')).on('change', function() {
             validator.revalidateField('id_role');
             var id = this.value
-            var url = '{{ url("admin") }}/' + '{{ $title }}/' +  id + '/show';
+            var url = '{{ url('admin') }}/' + '{{ $title }}/' + id + '/show';
             $.ajax({
                 url: url,
                 type: "GET",

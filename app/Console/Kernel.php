@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\MakeContract;
+use App\Console\Commands\UpdateStatusArsip;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -10,6 +11,7 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         MakeContract::class,
+        UpdateStatusArsip::class,
     ];
 
     /**
@@ -20,6 +22,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Update status arsip setiap hari pada jam 02:00
+        $schedule->command('arsip:update-status')
+            ->dailyAt('02:00')
+            ->withoutOverlapping()
+            ->runInBackground();
+
         // $schedule->command('inspire')->hourly();
     }
 

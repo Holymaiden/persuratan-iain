@@ -84,8 +84,7 @@ class SuratKeluarController extends Controller
                 $file_name = pathinfo($file, PATHINFO_FILENAME);
                 $file_name = $this->uploadFile2($request->file('file'), $this->file_path, '');
                 $req['file'] = $file_name;
-            }
-            else {
+            } else {
                 $req['file'] = '-';
             }
             $req['uraian'] = $req['uraian'] ?? '-';
@@ -254,10 +253,9 @@ class SuratKeluarController extends Controller
 
             //$req['updated_by'] = Auth::user()->id;
 
-            if (!File::exists(public_path('uploads/surat-keluar/' . $data->file))) {
-                return dd('file tidak ada');
+            if (File::exists(public_path('uploads/surat-keluar/' . $data->file))) {
+                $copy = File::copy(public_path('uploads/surat-keluar/' . $data->file), public_path('uploads/arsip/' . $data->file));
             }
-            $copy = File::copy(public_path('uploads/surat-keluar/' . $data->file), public_path('uploads/arsip/' . $data->file));
             try {
                 $update_data = $this->repo->update(['status_arsip' => 'arsip', 'updated_by' => Auth::user()->id], $id);
                 $store = $this->arsip->store($req);
